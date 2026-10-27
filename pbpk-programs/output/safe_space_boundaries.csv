@@ -1,0 +1,9 @@
+scenario,endpoint,n_subj,ss_lo,ss_hi
+ER CV,Cmax,48,2.0,4.15
+ER CV,Cmax,86,1.8,4.25
+ER CV,AUC_inf,48,1.0,4.95
+ER CV,AUC_inf,86,1.0,5.05
+ER CV,AUC_0-t,48,1.0,4.6
+ER CV,AUC_0-t,86,1.0,4.7
+ER CV,Joint (Cmax & AUC_0-t),48,1.95,4.1
+ER CV,Joint (Cmax & AUC_0-t),86,1.85,4.25

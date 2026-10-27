@@ -1,0 +1,77 @@
+[ Info: Joint fit over 192 subject-arms (8 formulations, shared disposition)
+[ Info: Checking the initial parameter values.
+[ Info: The initial negative log likelihood and its gradient are finite. Check passed.
+Iter     Function value   Gradient norm 
+     0     7.556723e+03     3.188947e+03
+ * time: 1.9073486328125e-5
+     1     7.490634e+03     2.026955e+03
+ * time: 3.978790044784546
+     2     6.642561e+03     1.187618e+03
+ * time: 5.65120005607605
+     3     6.218868e+03     5.993185e+02
+ * time: 7.415542125701904
+     4     6.153373e+03     1.574367e+02
+ * time: 8.94806694984436
+     5     6.137975e+03     1.275424e+02
+ * time: 10.51419711112976
+     6     6.122923e+03     1.307987e+02
+ * time: 12.089072942733765
+     7     6.112216e+03     5.988643e+01
+ * time: 13.589946985244751
+     8     6.109506e+03     4.493049e+01
+ * time: 15.11643099784851
+     9     6.107077e+03     3.871522e+01
+ * time: 16.64463496208191
+    10     6.104488e+03     4.918235e+01
+ * time: 18.21532106399536
+    11     6.100062e+03     7.169323e+01
+ * time: 19.75321912765503
+    12     6.096315e+03     5.277790e+01
+ * time: 21.35767412185669
+    13     6.094877e+03     2.541142e+01
+ * time: 22.890655040740967
+    14     6.094528e+03     1.383215e+01
+ * time: 24.372020959854126
+    15     6.094366e+03     1.029535e+01
+ * time: 25.91475510597229
+    16     6.094281e+03     8.430795e+00
+ * time: 27.494965076446533
+    17     6.094198e+03     8.284977e+00
+ * time: 29.010117053985596
+    18     6.094082e+03     1.106041e+01
+ * time: 30.55223512649536
+    19     6.093904e+03     1.593292e+01
+ * time: 32.061190128326416
+    20     6.093702e+03     1.609948e+01
+ * time: 33.576164960861206
+    21     6.093593e+03     7.943070e+00
+ * time: 35.13755202293396
+    22     6.093573e+03     1.485079e+00
+ * time: 36.639002084732056
+    23     6.093572e+03     1.101769e-01
+ * time: 38.073745012283325
+    24     6.093572e+03     3.624191e-02
+ * time: 39.3100860118866
+
+Joint population parameter estimates (shared disposition + IVIVC slope):
+1×11 DataFrame
+ Row │ tvalpha  slope     tvgamma  tvcl     tvvc     tvlag    omega_alpha  omega_cl   omega_vc  sigma_p   OFV
+     │ Float64  Float64   Float64  Float64  Float64  Float64  Float64      Float64    Float64   Float64   Missing
+─────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │ 1.61581  0.100216  1.71254  12.1317  129.045    0.001    0.0772563  0.0844688   0.17867  0.208528  missing
+
+IVIVC — fitted in-vivo release scale (Alpha) vs PBPK T50 (slope = 0.1):
+8×3 DataFrame
+ Row │ T50      gm_alpha  ratio
+     │ Float64  Float64   Float64
+─────┼─────────────────────────────
+   1 │     1.0   1.42575  1.42575
+   2 │     2.0   1.56506  0.78253
+   3 │     3.0   1.67669  0.558896
+   4 │     3.5   1.66988  0.477108
+   5 │     4.0   1.71639  0.429098
+   6 │     5.0   1.70939  0.341878
+   7 │     6.0   1.69751  0.282918
+   8 │     7.0   1.75567  0.25081
+
+Wrote poppk_param_estimates.csv, poppk_icoef.csv, poppk_ipred_profiles.csv -> <repo>/poppk-joint/poppk_pumas/output

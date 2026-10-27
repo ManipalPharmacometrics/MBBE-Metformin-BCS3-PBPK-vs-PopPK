@@ -1,0 +1,25 @@
+endpoint,source,n_subj,ss_lo,ss_hi
+Cmax,PBPK,48,2.0,4.15
+Cmax,PopPK_gammaOpen,48,1.7,4.6
+Cmax,PopPK_gamma1,48,1.0,6.4
+Cmax,PBPK,86,1.8,4.25
+Cmax,PopPK_gammaOpen,86,1.5,4.8
+Cmax,PopPK_gamma1,86,1.0,6.6
+AUC_tEnd,PBPK,48,1.0,4.6
+AUC_tEnd,PopPK_gammaOpen,48,1.0,6.15
+AUC_tEnd,PopPK_gamma1,48,1.0,7.0
+AUC_tEnd,PBPK,86,1.0,4.7
+AUC_tEnd,PopPK_gammaOpen,86,1.0,6.4
+AUC_tEnd,PopPK_gamma1,86,1.0,7.0
+AUC_inf,PBPK,48,1.0,4.95
+AUC_inf,PopPK_gammaOpen,48,1.0,7.0
+AUC_inf,PopPK_gamma1,48,1.0,7.0
+AUC_inf,PBPK,86,1.0,5.05
+AUC_inf,PopPK_gammaOpen,86,1.0,7.0
+AUC_inf,PopPK_gamma1,86,1.0,7.0
+Joint (Cmax & AUC_0-t),PBPK,48,1.95,4.1
+Joint (Cmax & AUC_0-t),PopPK_gammaOpen,48,1.65,4.55
+Joint (Cmax & AUC_0-t),PopPK_gamma1,48,1.0,6.35
+Joint (Cmax & AUC_0-t),PBPK,86,1.85,4.25
+Joint (Cmax & AUC_0-t),PopPK_gammaOpen,86,1.5,4.8
+Joint (Cmax & AUC_0-t),PopPK_gamma1,86,1.0,6.6

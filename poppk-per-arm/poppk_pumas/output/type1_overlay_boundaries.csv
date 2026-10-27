@@ -1,0 +1,17 @@
+endpoint,source,side,bnd_T50,limit,binding
+Cmax,PBPK,low,1.457076562471155,1.25,Cmax
+Cmax,PBPK,high,4.623232849897319,0.80,Cmax
+Cmax,PopPK,low,1.3585005942937374,1.25,Cmax
+Cmax,PopPK,high,4.574194755420334,0.80,Cmax
+AUC_tEnd,PBPK,low,,not reached,AUC_tEnd
+AUC_tEnd,PBPK,high,5.183983647896175,0.80,AUC_tEnd
+AUC_tEnd,PopPK,low,,not reached,AUC_tEnd
+AUC_tEnd,PopPK,high,5.220892199032311,0.80,AUC_tEnd
+AUC_inf,PBPK,low,,not reached,AUC_inf
+AUC_inf,PBPK,high,5.357435086347566,1.25,AUC_inf
+AUC_inf,PopPK,low,,not reached,AUC_inf
+AUC_inf,PopPK,high,6.157512168734905,0.80,AUC_inf
+Joint (Cmax & AUC_0-t),PBPK,low,1.457076562471155,1.25,Cmax
+Joint (Cmax & AUC_0-t),PBPK,high,4.623232849897319,0.80,Cmax
+Joint (Cmax & AUC_0-t),PopPK,low,1.3585005942937374,1.25,Cmax
+Joint (Cmax & AUC_0-t),PopPK,high,4.574194755420334,0.80,Cmax

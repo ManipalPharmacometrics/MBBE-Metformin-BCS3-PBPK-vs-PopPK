@@ -1,0 +1,457 @@
+﻿"IndividualId","QuantityPath","Parameter","Value","Unit"
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",16.84147,µmol/l
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",11.81918,µmol/l
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",12.02436,µmol/l
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",11.20623,µmol/l
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",13.10236,µmol/l
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",10.81698,µmol/l
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",13.97188,µmol/l
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",14.39118,µmol/l
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",14.61883,µmol/l
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",10.14318,µmol/l
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",12.52294,µmol/l
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",17.06855,µmol/l
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",21.19866,µmol/l
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",18.38593,µmol/l
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",19.34833,µmol/l
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",16.97213,µmol/l
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",21.2207,µmol/l
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",19.45632,µmol/l
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",9.60156,µmol/l
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",15.21331,µmol/l
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",12.87277,µmol/l
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",18.27925,µmol/l
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",19.38861,µmol/l
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max",19.57654,µmol/l
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",312945.3,mg/l
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",302138.9,mg/l
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",311274.9,mg/l
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",223603,mg/l
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",400397.3,mg/l
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",249683.4,mg/l
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",406090.9,mg/l
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",288919.8,mg/l
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",310897.6,mg/l
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",271148.1,mg/l
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",339433.9,mg/l
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",300614,mg/l
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",479604.4,mg/l
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",299805.8,mg/l
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",353690.5,mg/l
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",329739.3,mg/l
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",383054.7,mg/l
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",329145.7,mg/l
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",220684.2,mg/l
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",366277,mg/l
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",311324.3,mg/l
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",413525.8,mg/l
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",341764.2,mg/l
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_max_norm",474638.9,mg/l
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",4.75,h
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",4.75,h
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",5.5,h
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",2.5,h
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",4.75,h
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",3.5,h
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",5.25,h
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",3.5,h
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",4,h
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",3,h
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",6.25,h
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",5.75,h
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",6.25,h
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",5,h
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",6.25,h
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",5.5,h
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",4.25,h
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",3.5,h
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",2.25,h
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",4.75,h
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",4.25,h
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",4.25,h
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",5,h
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","t_max",5,h
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",2.735323,µmol/l
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",1.671297,µmol/l
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",2.209957,µmol/l
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",3.53782,µmol/l
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",4.505649,µmol/l
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",3.582321,µmol/l
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",3.225555,µmol/l
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",2.944147,µmol/l
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",3.121582,µmol/l
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",2.31397,µmol/l
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",1.804656,µmol/l
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",1.879522,µmol/l
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",4.657928,µmol/l
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",2.194592,µmol/l
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",3.280562,µmol/l
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",1.713106,µmol/l
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",5.190388,µmol/l
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",5.532488,µmol/l
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",3.07485,µmol/l
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",2.006757,µmol/l
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",1.726151,µmol/l
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",5.375881,µmol/l
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",2.965279,µmol/l
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","C_tEnd",5.946845,µmol/l
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",12552.46,µmol*min/l
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",10358.57,µmol*min/l
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",8235.938,µmol*min/l
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",7059.377,µmol*min/l
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",10474.13,µmol*min/l
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",7218.5,µmol*min/l
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",10326.45,µmol*min/l
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",9261.071,µmol*min/l
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",9328.99,µmol*min/l
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",5938.975,µmol*min/l
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",8937.162,µmol*min/l
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",14240.21,µmol*min/l
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",19691.04,µmol*min/l
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",10388.37,µmol*min/l
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",15757.02,µmol*min/l
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",13099.79,µmol*min/l
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",14614.04,µmol*min/l
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",13219.84,µmol*min/l
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",6037.518,µmol*min/l
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",8907.741,µmol*min/l
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",8720.801,µmol*min/l
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",13418.16,µmol*min/l
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",11573.02,µmol*min/l
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd",15407.78,µmol*min/l
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",2.332477E+11,µg*min/l
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",2.648006E+11,µg*min/l
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",2.13204E+11,µg*min/l
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",1.40859E+11,µg*min/l
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",3.200807E+11,µg*min/l
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",1.666213E+11,µg*min/l
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",3.00137E+11,µg*min/l
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",1.859269E+11,µg*min/l
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",1.983989E+11,µg*min/l
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",1.58761E+11,µg*min/l
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",2.422416E+11,µg*min/l
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",2.508009E+11,µg*min/l
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",4.454956E+11,µg*min/l
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",1.693954E+11,µg*min/l
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",2.880409E+11,µg*min/l
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",2.545064E+11,µg*min/l
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",2.637979E+11,µg*min/l
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",2.236421E+11,µg*min/l
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",1.387675E+11,µg*min/l
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",2.144636E+11,µg*min/l
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",2.109101E+11,µg*min/l
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",3.035547E+11,µg*min/l
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",2.039982E+11,µg*min/l
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_tEnd_norm",3.735662E+11,µg*min/l
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",17633.27,µmol*min/l
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",10969.06,µmol*min/l
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",19586.66,µmol*min/l
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",315889.6,µmol*min/l
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",27652.72,µmol*min/l
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",50266.85,µmol*min/l
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",16281.14,µmol*min/l
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",16748.68,µmol*min/l
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",24184.53,µmol*min/l
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",51277.63,µmol*min/l
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",10687.49,µmol*min/l
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",15055.71,µmol*min/l
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",23071.07,µmol*min/l
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",23700.62,µmol*min/l
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",19511.6,µmol*min/l
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",14190.63,µmol*min/l
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",35191.02,µmol*min/l
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",59720.08,µmol*min/l
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",258324.6,µmol*min/l
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",15434.76,µmol*min/l
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",14776.35,µmol*min/l
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",39306.98,µmol*min/l
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",29731.77,µmol*min/l
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf",34974.43,µmol*min/l
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",3.276583E+11,µg*min/l
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",2.80407E+11,µg*min/l
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",5.070406E+11,µg*min/l
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",6.30309E+12,µg*min/l
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",8.450443E+11,µg*min/l
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",1.160286E+12,µg*min/l
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",4.732093E+11,µg*min/l
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",3.362495E+11,µg*min/l
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",5.143306E+11,µg*min/l
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",1.370756E+12,µg*min/l
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",2.89684E+11,µg*min/l
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",2.651635E+11,µg*min/l
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",5.219663E+11,µg*min/l
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",3.864685E+11,µg*min/l
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",3.56675E+11,µg*min/l
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",2.756996E+11,µg*min/l
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",6.35233E+11,µg*min/l
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",1.010294E+12,µg*min/l
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",5.937383E+12,µg*min/l
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",3.716087E+11,µg*min/l
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",3.573618E+11,µg*min/l
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",8.892293E+11,µg*min/l
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",5.240835E+11,µg*min/l
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","AUC_inf_norm",8.479654E+11,µg*min/l
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",22.16573,h
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",10.99332,h
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",67.15566,h
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",1446.07,h
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",58.29327,h
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",193.5007,h
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",26.16739,h
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",34.7147,h
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",66.93996,h
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",310.9893,h
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",14.15053,h
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",10.61446,h
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",14.02114,h
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",73.70534,h
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",15.83986,h
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",10.95303,h
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",56.59023,h
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",129.9011,h
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",1359.192,h
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",37.84867,h
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",38.6734,h
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",72.01599,h
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",80.30741,h
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","MRT",48.52435,h
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",21.45845,h
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",4.219915,h
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",59.33542,h
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",1008.459,h
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",44.04579,h
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",138.8245,h
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",21.32694,h
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",29.38041,h
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",54.97786,h
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",226.3524,h
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",11.20465,h
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",5.012423,h
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",8.383034,h
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",70.07644,h
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",13.22167,h
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",7.35616,h
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",45.79903,h
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",97.09769,h
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",947.8622,h
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",37.57458,h
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",40.52744,h
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",55.63356,h
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",70.74482,h
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Thalf",38.01055,h
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.2881376,
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.0556562,
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.579513,
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.9776524,
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.6212261,
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.8563964,
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.3657415,
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.4470567,
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.6142579,
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.88418,
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.1637732,
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.05416513,
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.1465049,
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.5616838,
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.1924277,
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.07687046,
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.5847226,
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.7786366,
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.9766282,
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.4228778,
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.4098137,
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.6586317,
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.6107525,
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","FractionAucLastToInf",0.5594559,
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",3.05196,ml/min/kg
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",3.566244,ml/min/kg
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",1.972229,ml/min/kg
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",0.1586524,ml/min/kg
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",1.18337,ml/min/kg
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",0.8618561,ml/min/kg
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",2.11323,ml/min/kg
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",2.973982,ml/min/kg
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",1.944275,ml/min/kg
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",0.7295243,ml/min/kg
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",3.452037,ml/min/kg
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",3.771258,ml/min/kg
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",1.915833,ml/min/kg
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",2.587533,ml/min/kg
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",2.803673,ml/min/kg
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",3.627136,ml/min/kg
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",1.574226,ml/min/kg
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",0.9898109,ml/min/kg
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",0.1684244,ml/min/kg
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",2.691003,ml/min/kg
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",2.798284,ml/min/kg
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",1.124569,ml/min/kg
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",1.908093,ml/min/kg
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","CL",1.179293,ml/min/kg
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",4058.935,ml/kg
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",2352.292,ml/kg
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",7946.779,ml/kg
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",13765.34,ml/kg
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",4138.95,ml/kg
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",10006.19,ml/kg
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",3317.863,ml/kg
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",6194.453,ml/kg
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",7808.982,ml/kg
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",13612.45,ml/kg
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",2930.889,ml/kg
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",2401.792,ml/kg
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",1611.73,ml/kg
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",11442.9,ml/kg
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",2664.587,ml/kg
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",2383.688,ml/kg
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",5345.147,ml/kg
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",7714.65,ml/kg
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",13735.26,ml/kg
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",6111.053,ml/kg
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",6493.15,ml/kg
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",4859.218,ml/kg
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",9194.039,ml/kg
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vss",3433.467,ml/kg
+0,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",5668.955,ml/kg
+1,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",1302.688,ml/kg
+2,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",10129.71,ml/kg
+3,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",13849.39,ml/kg
+4,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",4511.809,ml/kg
+5,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",10356.83,ml/kg
+6,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",3901.227,ml/kg
+7,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",7563.486,ml/kg
+8,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",9252.76,ml/kg
+9,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",14293.9,ml/kg
+10,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",3348.107,ml/kg
+11,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",1636.288,ml/kg
+12,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",1390.223,ml/kg
+13,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",15695.81,ml/kg
+14,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",3208.776,ml/kg
+15,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",2309.622,ml/kg
+16,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",6240.925,ml/kg
+17,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",8319.303,ml/kg
+18,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",13818.98,ml/kg
+19,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",8752.54,ml/kg
+20,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",9816.728,ml/kg
+21,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",5415.628,ml/kg
+22,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",11684.76,ml/kg
+23,"Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood)","Vd",3880.179,ml/kg
+0,"Metformin","Vss (plasma)",3354.528,ml/kg
+1,"Metformin","Vss (plasma)",1897.758,ml/kg
+2,"Metformin","Vss (plasma)",11224.85,ml/kg
+3,"Metformin","Vss (plasma)",134708.5,ml/kg
+4,"Metformin","Vss (plasma)",4791.794,ml/kg
+5,"Metformin","Vss (plasma)",27928.22,ml/kg
+6,"Metformin","Vss (plasma)",2403.263,ml/kg
+7,"Metformin","Vss (plasma)",3639.905,ml/kg
+8,"Metformin","Vss (plasma)",8515.564,ml/kg
+9,"Metformin","Vss (plasma)",41919.25,ml/kg
+10,"Metformin","Vss (plasma)",1742.857,ml/kg
+11,"Metformin","Vss (plasma)",1822.733,ml/kg
+12,"Metformin","Vss (plasma)",1283.744,ml/kg
+13,"Metformin","Vss (plasma)",13437.45,ml/kg
+14,"Metformin","Vss (plasma)",2095.223,ml/kg
+15,"Metformin","Vss (plasma)",1725.678,ml/kg
+16,"Metformin","Vss (plasma)",5452.437,ml/kg
+17,"Metformin","Vss (plasma)",12511.21,ml/kg
+18,"Metformin","Vss (plasma)",127758.2,ml/kg
+19,"Metformin","Vss (plasma)",5112.595,ml/kg
+20,"Metformin","Vss (plasma)",6743.983,ml/kg
+21,"Metformin","Vss (plasma)",6279.327,ml/kg
+22,"Metformin","Vss (plasma)",12356.12,ml/kg
+23,"Metformin","Vss (plasma)",3863.45,ml/kg
+0,"Metformin","Vd (plasma)",4685.137,ml/kg
+1,"Metformin","Vd (plasma)",1050.969,ml/kg
+2,"Metformin","Vd (plasma)",14308.25,ml/kg
+3,"Metformin","Vd (plasma)",135530.9,ml/kg
+4,"Metformin","Vd (plasma)",5223.464,ml/kg
+5,"Metformin","Vd (plasma)",28906.89,ml/kg
+6,"Metformin","Vd (plasma)",2825.818,ml/kg
+7,"Metformin","Vd (plasma)",4444.359,ml/kg
+8,"Metformin","Vd (plasma)",10089.98,ml/kg
+9,"Metformin","Vd (plasma)",44017.74,ml/kg
+10,"Metformin","Vd (plasma)",1990.957,ml/kg
+11,"Metformin","Vd (plasma)",1241.788,ml/kg
+12,"Metformin","Vd (plasma)",1107.314,ml/kg
+13,"Metformin","Vd (plasma)",18431.66,ml/kg
+14,"Metformin","Vd (plasma)",2523.131,ml/kg
+15,"Metformin","Vd (plasma)",1672.057,ml/kg
+16,"Metformin","Vd (plasma)",6366.195,ml/kg
+17,"Metformin","Vd (plasma)",13491.8,ml/kg
+18,"Metformin","Vd (plasma)",128536.9,ml/kg
+19,"Metformin","Vd (plasma)",7322.5,ml/kg
+20,"Metformin","Vd (plasma)",10195.95,ml/kg
+21,"Metformin","Vd (plasma)",6998.349,ml/kg
+22,"Metformin","Vd (plasma)",15703.47,ml/kg
+23,"Metformin","Vd (plasma)",4366.107,ml/kg
+0,"Metformin","Total plasma clearance",2.522308,ml/min/kg
+1,"Metformin","Total plasma clearance",2.877137,ml/min/kg
+2,"Metformin","Total plasma clearance",2.785779,ml/min/kg
+3,"Metformin","Total plasma clearance",1.552582,ml/min/kg
+4,"Metformin","Total plasma clearance",1.370025,ml/min/kg
+5,"Metformin","Total plasma clearance",2.405523,ml/min/kg
+6,"Metformin","Total plasma clearance",1.530699,ml/min/kg
+7,"Metformin","Total plasma clearance",1.747533,ml/min/kg
+8,"Metformin","Total plasma clearance",2.1202,ml/min/kg
+9,"Metformin","Total plasma clearance",2.246554,ml/min/kg
+10,"Metformin","Total plasma clearance",2.052759,ml/min/kg
+11,"Metformin","Total plasma clearance",2.862028,ml/min/kg
+12,"Metformin","Total plasma clearance",1.525963,ml/min/kg
+13,"Metformin","Total plasma clearance",3.038553,ml/min/kg
+14,"Metformin","Total plasma clearance",2.204589,ml/min/kg
+15,"Metformin","Total plasma clearance",2.625876,ml/min/kg
+16,"Metformin","Total plasma clearance",1.605824,ml/min/kg
+17,"Metformin","Total plasma clearance",1.605222,ml/min/kg
+18,"Metformin","Total plasma clearance",1.566596,ml/min/kg
+19,"Metformin","Total plasma clearance",2.251332,ml/min/kg
+20,"Metformin","Total plasma clearance",2.906383,ml/min/kg
+21,"Metformin","Total plasma clearance",1.453225,ml/min/kg
+22,"Metformin","Total plasma clearance",2.564337,ml/min/kg
+23,"Metformin","Total plasma clearance",1.32698,ml/min/kg
+0,"Metformin","Bioavailability",0.8264552,
+1,"Metformin","Bioavailability",0.8067694,
+2,"Metformin","Bioavailability",1.412503,
+3,"Metformin","Bioavailability",9.78606,
+4,"Metformin","Bioavailability",1.157732,
+5,"Metformin","Bioavailability",2.791095,
+6,"Metformin","Bioavailability",0.7243408,
+7,"Metformin","Bioavailability",0.5876071,
+8,"Metformin","Bioavailability",1.090483,
+9,"Metformin","Bioavailability",3.079478,
+10,"Metformin","Bioavailability",0.5946515,
+11,"Metformin","Bioavailability",0.7589055,
+12,"Metformin","Bioavailability",0.7965009,
+13,"Metformin","Bioavailability",1.174305,
+14,"Metformin","Bioavailability",0.7863218,
+15,"Metformin","Bioavailability",0.7239529,
+16,"Metformin","Bioavailability",1.020072,
+17,"Metformin","Bioavailability",1.621746,
+18,"Metformin","Bioavailability",9.301478,
+19,"Metformin","Bioavailability",0.8366144,
+20,"Metformin","Bioavailability",1.03863,
+21,"Metformin","Bioavailability",1.292251,
+22,"Metformin","Bioavailability",1.343927,
+23,"Metformin","Bioavailability",1.125233,
+0,"Metformin","Fraction absorbed",0.644626,
+1,"Metformin","Fraction absorbed",0.8292077,
+2,"Metformin","Fraction absorbed",0.6133912,
+3,"Metformin","Fraction absorbed",0.3620322,
+4,"Metformin","Fraction absorbed",0.5453368,
+5,"Metformin","Fraction absorbed",0.5103561,
+6,"Metformin","Fraction absorbed",0.5383573,
+7,"Metformin","Fraction absorbed",0.3820406,
+8,"Metformin","Fraction absorbed",0.471522,
+9,"Metformin","Fraction absorbed",0.3797731,
+10,"Metformin","Fraction absorbed",0.5530997,
+11,"Metformin","Fraction absorbed",0.7817256,
+12,"Metformin","Fraction absorbed",0.7758363,
+13,"Metformin","Fraction absorbed",0.5152927,
+14,"Metformin","Fraction absorbed",0.7026762,
+15,"Metformin","Fraction absorbed",0.7213045,
+16,"Metformin","Fraction absorbed",0.4996982,
+17,"Metformin","Fraction absorbed",0.4307485,
+18,"Metformin","Fraction absorbed",0.2898638,
+19,"Metformin","Fraction absorbed",0.5119201,
+20,"Metformin","Fraction absorbed",0.622165,
+21,"Metformin","Fraction absorbed",0.5307433,
+22,"Metformin","Fraction absorbed",0.5387559,
+23,"Metformin","Fraction absorbed",0.5994468,

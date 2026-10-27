@@ -1,0 +1,6 @@
+Dose: 3019.5 µmol  (390.0 mg free base)
+Schedule (5 obs/subject, h): 1.0, 3.0, 6.0, 12.0, 24.0
+Residual error: proportional 15% CV   seed=20260610
+Formulations (T50 h): 1.0, 2.0, 3.0, 3.5, 4.0, 5.0, 6.0, 7.0
+Subjects/formulation: 24
+Wrote 1152 rows -> <repo>/poppk-per-arm/poppk_pumas/output_sparse/sparse_be_dataset.csv

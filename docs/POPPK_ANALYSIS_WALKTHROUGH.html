@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>poppk_analysis_walkthrough</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="POPPK_ANALYSIS_WALKTHROUGH_files/libs/clipboard/clipboard.min.js"></script>
+<script src="POPPK_ANALYSIS_WALKTHROUGH_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="POPPK_ANALYSIS_WALKTHROUGH_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="POPPK_ANALYSIS_WALKTHROUGH_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="POPPK_ANALYSIS_WALKTHROUGH_files/libs/quarto-html/popper.min.js"></script>
+<script src="POPPK_ANALYSIS_WALKTHROUGH_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="POPPK_ANALYSIS_WALKTHROUGH_files/libs/quarto-html/anchor.min.js"></script>
+<link href="POPPK_ANALYSIS_WALKTHROUGH_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="POPPK_ANALYSIS_WALKTHROUGH_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="POPPK_ANALYSIS_WALKTHROUGH_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="POPPK_ANALYSIS_WALKTHROUGH_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="POPPK_ANALYSIS_WALKTHROUGH_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="poppk-based-mbbe-analysis-full-walkthrough-from-pbpk-output-to-decision-equivalence-overlay" class="level1">
+<h1>PopPK-based MBBE analysis — full walkthrough (from PBPK output to decision-equivalence overlay)</h1>
+<p><strong>Scope of this document.</strong> Everything that happens <em>after</em> PK-Sim produces the PBPK population output, in complete detail: how that output is consumed, whether a model is re-fit and re-simulated (yes — both), exactly which between-subject and residual variabilities (BSVs) are added and where, and how the per-formulation results are regenerated in the PopPK model and compared against the PBPK model from PK-Sim.</p>
+<p><strong>Code documented:</strong> <code>programs/poppk_pumas/</code> (Julia/Pumas). This is <em>bridge #1</em> from the project discussion (project notes (not included), §6):</p>
+<blockquote class="blockquote">
+<p><em>PK-Sim → simulate large virtual population → fit popPK model in Pumas → run MBBE statistics in Pumas. “PBPK-informed popPK.”</em></p>
+</blockquote>
+<p>The alternative (bridge #2 — run TOST directly on the PBPK profiles, no PopPK fit) is what Morris et al.&nbsp;did and is the PBPK “side” we compare against. The headline deliverable of the PopPK pipeline is the <strong>PBPK-vs-PopPK decision-equivalence overlay</strong>: <em>do the two methods place the bioequivalence safe-space boundaries in the same place and reach the same BE conclusions?</em></p>
+<hr>
+<section id="a-note-on-terminology-td50-vs-t50" class="level2">
+<h2 class="anchored" data-anchor-id="a-note-on-terminology-td50-vs-t50">0. A note on terminology — “TD50” vs <strong>T50</strong></h2>
+<p>There is no <code>TD50</code> in this project. The critical quality attribute (CQA) being swept is <strong>T50</strong> — the <strong>Weibull median dissolution (in-vitro release) time</strong> of the metformin XR formulation, in hours:</p>
+<pre><code>% released(t) = 100 · (1 − exp(−(t / T50)^β))</code></pre>
+<p>T50 is the single scalar formulation knob (analogous to particle radius in the Morris LAI paper). Larger T50 = slower release. <strong>Important:</strong> T50 is <em>not</em> a PK parameter that gets “regenerated” or estimated by the PopPK model. It is a <strong>formulation label / covariate</strong>. See §7 for exactly how it is handled on the PK-Sim side vs the PopPK side — that is the heart of your question.</p>
+<hr>
+</section>
+<section id="what-the-pbpk-output-actually-is-the-starting-point" class="level2">
+<h2 class="anchored" data-anchor-id="what-the-pbpk-output-actually-is-the-starting-point">1. What “the PBPK output” actually is (the starting point)</h2>
+<p>PK-Sim (Phase 4 of the master plan) produced, for <strong>8 formulations</strong> (T50 = 1.0, 2.0, 3.0, 3.5, 4.0, 5.0, 6.0, 7.0 h), a <strong>population simulation</strong> of <strong>24 virtual subjects</strong> each. Two kinds of files were exported and both live under <code>programs/poppk_pumas/data/</code>:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>File pattern</th>
+<th>What it holds</th>
+<th>Used by</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>popsims/Metformin_T50_&lt;x&gt;h_Simpop-Results.csv</code></td>
+<td><strong>Dense concentration–time profiles.</strong> One row per subject per time point on a <strong>3-minute grid, 0–24 h</strong> (≈3097 rows = 24 subj × ~129 times). Key column = peripheral-venous plasma metformin, <strong>µmol/L</strong>.</td>
+<td>PopPK pipeline (steps 01–03)</td>
+</tr>
+<tr class="even">
+<td><code>pbpk_pk_parameters_individual.csv</code></td>
+<td><strong>PBPK per-subject BE endpoints</strong> already NCA’d in PK-Sim: <code>T50, IndividualId, Cmax, AUC_inf, AUC_tEnd</code> (192 rows = 8×24).</td>
+<td>Overlay step 04 (the PBPK comparator)</td>
+</tr>
+</tbody>
+</table>
+<p>Critical structural fact that makes the whole comparison clean: <strong>PK-Sim simulates the same 24 virtual physiologies (IndividualId 0–23) under every formulation.</strong> So test-vs-reference is a <strong>fully paired 2×2 crossover</strong> with no period/sequence effect — the textbook average-BE setting. This pairing is exploited identically on both the PBPK and PopPK sides.</p>
+<p>The columns the pipeline reads from the dense Results.csv:</p>
+<ul>
+<li><code>IndividualId</code></li>
+<li><code>Time [min]</code></li>
+<li><code>Organism|PeripheralVenousBlood|Metformin|Plasma (Peripheral Venous Blood) [µmol/l]</code></li>
+</ul>
+<hr>
+</section>
+<section id="the-pipeline-at-a-glance" class="level2">
+<h2 class="anchored" data-anchor-id="the-pipeline-at-a-glance">2. The pipeline at a glance</h2>
+<p><code>programs/poppk_pumas/</code> runs four scripts in order (each in a fresh Julia process via <code>run_all.jl</code>, so top-level <code>const</code>s never clash and any failure halts the chain):</p>
+<pre><code>data/popsims/*-Results.csv   (dense PBPK truth, 24 subj, 0–24 h, 3-min grid)
+        │
+   01_build_dataset.jl   ── sparse-sample at BE schedule  +  add 15% proportional residual error
+        │                    → output/sparse_be_dataset.csv   (Pumas NONMEM-style)
+        ▼
+   02_fit_poppk.jl       ── FIT a 1-cmt PopPK model per formulation (FOCE)         ← THE REFIT
+        │                    → poppk_param_estimates.csv  (pop params + OFV)
+        │                    → poppk_icoef.csv            (per-subject EBEs Ka/CL/Vc)
+        │                    → poppk_ipred_profiles.csv   (dense IPRED 0–24 h)       ← THE RESIM
+        ▼
+   03_poppk_metrics.jl   ── NCA on the dense IPRED → per-subject Cmax/AUC_tEnd/AUC_inf
+        │                    → poppk_pk_parameters_individual.csv  (SAME schema as PBPK)
+        ▼
+   04_be_safespace_overlay.jl ── identical TOST/VBE/safe-space on PBPK *and* PopPK, overlay
+                             → be_overlay_gmr.csv, safe_space_overlay_boundaries.csv
+                             → fig_overlay_gmr.png, fig_overlay_safespace_*.png</code></pre>
+<p>The BE/VBE/safe-space statistics (<code>src/be_utils.jl</code>) are <strong>byte-for-byte the same helpers</strong> used on the PBPK side, so the overlay is a true apples-to-apples comparison — the only thing that differs between the two curves is <em>how the per-subject Cmax/AUC numbers were produced</em> (PK-Sim NCA vs PopPK fit → NCA).</p>
+<p><strong>Baseline design choices, locked 2026-06-10:</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Choice</th>
+<th>Value</th>
+<th>Set in</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sampling schedule</td>
+<td>rich BE: 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 16, 24 h (13 obs; predose = dose only)</td>
+<td><code>01</code> <code>RICH_SCHEDULE</code></td>
+</tr>
+<tr class="even">
+<td>Residual (assay) error</td>
+<td>proportional, <strong>15% CV</strong></td>
+<td><code>01</code> <code>PROP_CV</code></td>
+</tr>
+<tr class="odd">
+<td>Structural model</td>
+<td>1-compartment, first-order absorption + lag time</td>
+<td><code>src/poppk_model.jl</code></td>
+</tr>
+<tr class="even">
+<td>IIV (BSV)</td>
+<td>diagonal Ω on <strong>ka, CL, Vc</strong></td>
+<td><code>src/poppk_model.jl</code></td>
+</tr>
+<tr class="odd">
+<td>Reference formulation</td>
+<td><strong>T50 = 3.0 h</strong></td>
+<td><code>src/be_utils.jl</code> <code>REF_T50</code></td>
+</tr>
+<tr class="even">
+<td>Dose</td>
+<td>390 mg free base = <strong>3019.5 µmol</strong> (≙ 500 mg HCl tablet)</td>
+<td><code>01</code></td>
+</tr>
+<tr class="odd">
+<td>Fit</td>
+<td><strong>FOCE</strong>, each formulation arm fit independently</td>
+<td><code>02</code></td>
+</tr>
+<tr class="even">
+<td>VBE</td>
+<td>500 trials; n = 48 and 86; endpoint-specific within-subject CV</td>
+<td><code>src/be_utils.jl</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="step-01-build-the-simulated-be-study-01_build_dataset.jl" class="level2">
+<h2 class="anchored" data-anchor-id="step-01-build-the-simulated-be-study-01_build_dataset.jl">3. Step 01 — build the simulated BE study (<code>01_build_dataset.jl</code>)</h2>
+<p>The dense PBPK profiles are treated as the underlying <strong>“truth.”</strong> We turn them into a <strong>realistic, observable BE study</strong> — what you would actually measure in a clinic — by doing two things:</p>
+<section id="sparse-sampling" class="level3">
+<h3 class="anchored" data-anchor-id="sparse-sampling">3.1 Sparse-sampling</h3>
+<p>Each subject’s dense profile is sampled at the <strong>rich BE schedule</strong> (13 nominal times): <code>0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 16, 24 h</code>. Every nominal time lands exactly on the PK-Sim 3-minute grid (verified by converting hours→minutes and <code>findfirst</code>; an absent time is a hard error). Predose (t=0) is the <strong>dose event only</strong>, not an observation.</p>
+<p>A deferred truly-sparse alternative (<code>SPARSE_SCHEDULE = [1, 3, 6, 12, 24]</code>, ~6 points) is coded but not active — it would stress-test the fit.</p>
+</section>
+<section id="adding-residual-error-the-first-added-variability" class="level3">
+<h3 class="anchored" data-anchor-id="adding-residual-error-the-first-added-variability">3.2 Adding residual error (the <em>first</em> added variability)</h3>
+<p>To each sampled “true” concentration <code>c_true</code>, a <strong>proportional residual error of 15% CV</strong> is applied:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>c_obs <span class="op">=</span> c_true <span class="op">*</span> (<span class="fl">1</span> <span class="op">+</span> <span class="fl">0.15</span> <span class="op">*</span> <span class="fu">randn</span>())      <span class="co"># proportional (assay / intra-occasion) noise</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>c_obs <span class="op">=</span> <span class="fu">max</span>(c_obs, <span class="fl">1e-6</span>)                    <span class="co"># guard the rare negative draw</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This is the “simulated analytical measurement error” the master plan (Phase 4.2) and Morris both insist on: <strong>without it, zero-noise simulated profiles have unrealistically narrow Cmax/AUC distributions and the type-I-error / power analysis is meaningless</strong> — every trial would be a clean replicate. Seed = <code>20260610</code> for reproducibility.</p>
+</section>
+<section id="output-a-pumas-nonmem-style-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="output-a-pumas-nonmem-style-dataset">3.3 Output — a Pumas NONMEM-style dataset</h3>
+<p><code>output/sparse_be_dataset.csv</code>, one dose row + 13 observation rows per subject per formulation:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>col</th>
+<th>meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>SUBJID</code></td>
+<td><code>T50_&lt;t50&gt;_ID_&lt;id&gt;</code> (unique per arm×subject)</td>
+</tr>
+<tr class="even">
+<td><code>T50</code></td>
+<td>formulation label (carried through as a covariate)</td>
+</tr>
+<tr class="odd">
+<td><code>IndividualId</code></td>
+<td>0–23, the <strong>paired</strong> physiology id (carried through to preserve crossover pairing)</td>
+</tr>
+<tr class="even">
+<td><code>time</code></td>
+<td>hours</td>
+</tr>
+<tr class="odd">
+<td><code>evid</code></td>
+<td>1 = dose, 0 = observation</td>
+</tr>
+<tr class="even">
+<td><code>amt</code></td>
+<td>3019.5 µmol at t=0 into depot (cmt 1), else 0</td>
+</tr>
+<tr class="odd">
+<td><code>cmt</code></td>
+<td>1 = depot (dose), 2 = central (observation)</td>
+</tr>
+<tr class="even">
+<td><code>dv</code></td>
+<td>observed conc (µmol/L) = the noisy sample</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Dose detail:</strong> clinical 500 mg metformin <strong>HCl</strong> tablet = 390 mg free base (factor 0.78); PK-Sim doses in free base; converted mg→µmol with MW 129.16 → <strong>3019.5 µmol</strong>.</p>
+<hr>
+</section>
+</section>
+<section id="step-02-the-refit-fit-a-poppk-model-per-formulation-02_fit_poppk.jl" class="level2">
+<h2 class="anchored" data-anchor-id="step-02-the-refit-fit-a-poppk-model-per-formulation-02_fit_poppk.jl">4. Step 02 — the REFIT: fit a PopPK model per formulation (<code>02_fit_poppk.jl</code>)</h2>
+<p><strong>Yes — the model is re-fit.</strong> This is the core “PBPK-informed PopPK” step. We do <strong>not</strong> reuse any PBPK parameter. We hand the sparse, noisy BE dataset to Pumas and <strong>estimate a population PK model from scratch</strong>, exactly as you would with real clinical BE data — that is the whole point (it asks: <em>if you only had a clinical-style sparse study, would PopPK MBBE reach the same BE decision as the underlying PBPK?</em>).</p>
+<section id="the-structural-model-srcpoppk_model.jl" class="level3">
+<h3 class="anchored" data-anchor-id="the-structural-model-srcpoppk_model.jl">4.1 The structural model (<code>src/poppk_model.jl</code>)</h3>
+<p>A <strong>1-compartment disposition with first-order absorption and a lag time</strong> — the simplest model that reproduces the metformin XR profile shape. Rationale baked into the comments: <code>ka &lt; ke</code> reproduces the <strong>flip-flop kinetics</strong> seen in the XR PBPK profiles, and the in-vitro release <strong>T50 maps inversely onto the apparent ka</strong> (slower release → smaller apparent ka). Units match the PK-Sim exports (h, µmol, L, µmol/L).</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode julia code-with-copy"><code class="sourceCode julia"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="pp">@param</span> <span class="cf">begin</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    tvka  <span class="op">∈</span> <span class="fu">RealDomain</span>(lower<span class="op">=</span><span class="fl">0</span>, init<span class="op">=</span><span class="fl">0.5</span>)     <span class="co"># typical absorption rate (1/h)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    tvcl  <span class="op">∈</span> <span class="fu">RealDomain</span>(lower<span class="op">=</span><span class="fl">0</span>, init<span class="op">=</span><span class="fl">11.0</span>)    <span class="co"># typical clearance (L/h)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    tvvc  <span class="op">∈</span> <span class="fu">RealDomain</span>(lower<span class="op">=</span><span class="fl">0</span>, init<span class="op">=</span><span class="fl">120.0</span>)   <span class="co"># typical central volume (L)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    tvlag <span class="op">∈</span> <span class="fu">RealDomain</span>(lower<span class="op">=</span><span class="fl">0</span>, init<span class="op">=</span><span class="fl">0.25</span>)    <span class="co"># absorption lag (h)</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    Ω     <span class="op">∈</span> <span class="fu">PDiagDomain</span>(init<span class="op">=</span>[<span class="fl">0.09</span>,<span class="fl">0.09</span>,<span class="fl">0.09</span>])<span class="co"># IIV variances: ka, CL, Vc</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    σ_p   <span class="op">∈</span> <span class="fu">RealDomain</span>(lower<span class="op">=</span><span class="fl">0</span>, init<span class="op">=</span><span class="fl">0.15</span>)    <span class="co"># proportional residual SD</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="pp">@random</span>    η <span class="op">~</span> <span class="fu">MvNormal</span>(Ω)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="pp">@pre</span> <span class="cf">begin</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    Ka <span class="op">=</span> tvka <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">1</span>]);  CL <span class="op">=</span> tvcl <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">2</span>]);  Vc <span class="op">=</span> tvvc <span class="op">*</span> <span class="fu">exp</span>(η[<span class="fl">3</span>])</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="pp">@dosecontrol</span>  lags <span class="op">=</span> (Depot <span class="op">=</span> tvlag,)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="pp">@dynamics</span> <span class="cf">begin</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    Depot<span class="op">'</span>   <span class="op">=</span> <span class="op">-</span>Ka<span class="op">*</span>Depot</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    Central<span class="op">'</span> <span class="op">=</span>  Ka<span class="op">*</span>Depot <span class="op">-</span> (CL<span class="op">/</span>Vc)<span class="op">*</span>Central</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="pp">@derived</span> <span class="cf">begin</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    cp <span class="op">:=</span> @. Central<span class="op">/</span>Vc</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    dv <span class="op">~</span> @. <span class="fu">Normal</span>(cp, <span class="fu">abs</span>(cp)<span class="op">*</span>σ_p <span class="op">+</span> <span class="fl">1e-6</span>)   <span class="co"># proportional residual (tiny floor keeps SD&gt;0)</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="cf">end</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="what-bsvs-variabilities-are-in-the-model-the-second-added-variability" class="level3">
+<h3 class="anchored" data-anchor-id="what-bsvs-variabilities-are-in-the-model-the-second-added-variability">4.2 What BSVs / variabilities are in the model (the <em>second</em> added variability)</h3>
+<p>This is the explicit answer to “what BSVs were added”:</p>
+<ul>
+<li><strong>Between-subject variability (IIV / η, log-normal) on three parameters:</strong> <code>ka</code>, <code>CL</code>, <code>Vc</code>, via <code>Ka = tvka·exp(η₁)</code>, <code>CL = tvcl·exp(η₂)</code>, <code>Vc = tvvc·exp(η₃)</code>.</li>
+<li><strong>Ω is diagonal</strong> (<code>PDiagDomain</code>) — no off-diagonal (no IIV correlation modelled), initialised at variance <strong>0.09 each</strong> (≈30% CV) for ka, CL, Vc respectively.</li>
+<li><strong>Lag time is a fixed effect — NO IIV</strong> on lag, deliberately, for estimation stability (the comment notes IIV on lag can be added later if the fit supports it).</li>
+<li><strong>Residual error: proportional, <code>σ_p</code></strong> (init 0.15) — this is the model’s estimate of the same 15% proportional noise that step 01 injected.</li>
+</ul>
+<p>So there are <strong>two distinct, separately-purposed variabilities</strong> in the pipeline: 1. the <strong>15% proportional residual</strong> <em>added to the data</em> in step 01 (the assay noise the model then has to estimate back via <code>σ_p</code>), and 2. the <strong>IIV (Ω) on ka/CL/Vc</strong> <em>estimated by the model</em> in step 02 (genuine between-subject physiological spread). A third, separate within-subject CV is injected later for the VBE trials — see §6.2.</p>
+</section>
+<section id="estimation" class="level3">
+<h3 class="anchored" data-anchor-id="estimation">4.3 Estimation</h3>
+<ul>
+<li><strong>Each of the 8 formulation arms is read into its own <code>Pumas</code> population and fit independently</strong> with <strong><code>FOCE()</code></strong> (<code>init_params(poppk_model)</code> as starting values). The arms are <em>not</em> pooled — this mirrors “each formulation characterised independently.” (A joint model with formulation as a categorical covariate on <code>ka</code> is noted as a reasonable alternative in the README, not used in the baseline.)</li>
+<li><code>read_pumas</code> maps: <code>id=:SUBJID, time=:time, amt=:amt, evid=:evid, cmt=:cmt,   observations=[:dv], covariates=[:T50, :IndividualId]</code>. Note <strong>T50 and IndividualId are carried as covariates</strong> — they are <em>not</em> estimated; they are bookkeeping (formulation label + crossover-pairing id).</li>
+</ul>
+</section>
+<section id="the-re-simulation-dense-individual-predictions" class="level3">
+<h3 class="anchored" data-anchor-id="the-re-simulation-dense-individual-predictions">4.4 The RE-SIMULATION: dense individual predictions</h3>
+<p>After each fit we <strong>regenerate dense profiles</strong>:</p>
+<ul>
+<li><code>icoef(fpm)</code> → per-subject <strong>empirical Bayes estimates (EBEs)</strong> of <code>Ka, CL, Vc</code> → <code>poppk_icoef.csv</code>.</li>
+<li><code>predict(fpm; obstimes = 0:0.05:24)</code> → <strong>dense individual predictions (IPRED)</strong> on a 0.05-h grid spanning <strong>0–24 h to match the PBPK profile window</strong> (same truncation on both sides ⇒ fair AUC comparison) → <code>poppk_ipred_profiles.csv</code> (reads <code>pr.ipred.dv</code>, <code>pr.time</code>).</li>
+</ul>
+<p>So “did we re-simulate?” — <strong>yes:</strong> the fitted PopPK model is used to reconstruct smooth 0–24 h concentration–time curves for every subject. (This is an individual-prediction reconstruction from the EBEs, <em>not</em> a fresh stochastic simulation of brand-new subjects — the 24 paired physiologies are preserved so the crossover pairing survives into the BE step.)</p>
+<blockquote class="blockquote">
+<p><strong>Robustness note (README):</strong> because the disposition is a textbook 1-cmt first-order model, the dense IPRED can be regenerated <strong>analytically</strong> from <code>poppk_icoef.csv</code> without re-running Pumas: <code>C(t) = (Dose·Ka)/(Vc·(Ka−ke))·(e^(−ke·(t−lag)) − e^(−Ka·(t−lag)))</code>, <code>t&gt;lag</code>, <code>ke = CL/Vc</code> (with the <code>Ka≈ke</code> limit handled). This is a fallback if <code>icoef</code>/<code>predict</code> field names differ across Pumas versions.</p>
+</blockquote>
+<p><strong>Outputs of step 02:</strong> <code>poppk_param_estimates.csv</code> (tvka, tvcl, tvvc, tvlag, the three Ω diagonals, σ_p, and OFV via <code>deviance</code>, wrapped in try/catch → <code>missing</code> if unavailable), <code>poppk_icoef.csv</code>, <code>poppk_ipred_profiles.csv</code>.</p>
+<blockquote class="blockquote">
+<p>This is the <strong>only Pumas-license-sensitive step.</strong> It has <em>not</em> been executed on the authoring host (the open-registry <code>Pumas</code> there is an empty stub); it must run on a licensed Pumas / JuliaHub session. Steps 01, 03, 04 use only open packages.</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="step-03-regenerate-the-be-endpoints-from-the-poppk-profiles-03_poppk_metrics.jl" class="level2">
+<h2 class="anchored" data-anchor-id="step-03-regenerate-the-be-endpoints-from-the-poppk-profiles-03_poppk_metrics.jl">5. Step 03 — regenerate the BE endpoints from the PopPK profiles (<code>03_poppk_metrics.jl</code>)</h2>
+<p>Now the PopPK dense IPRED profiles are turned back into the <strong>same three BE endpoints the PBPK side reports</strong>, using a minimal, transparent NCA (<code>src/nca_lite.jl</code>) so the comparison is on identical metric definitions:</p>
+<ul>
+<li><strong>Cmax</strong> — observed peak of the dense profile.</li>
+<li><strong>AUC_tEnd</strong> (= AUC₀–t, the 0–24 h window) — <strong>linear-up / log-down trapezoid</strong> (<code>auc_trap</code>): log-trapezoid on falling segments, linear on rising/flat/zero. The 0.05-h grid makes this effectively exact.</li>
+<li><strong>AUC_inf</strong> = AUC_tEnd + Clast/λz, where <strong>λz</strong> is the terminal slope from a log-linear regression that scans the last 3–8 post-peak points and keeps the best adjusted R² (<code>lambda_z</code>) — standard NCA practice.</li>
+<li>Diagnostics also kept: Tmax, % extrapolated, λz adjusted R².</li>
+</ul>
+<p>The output <code>output/poppk_pk_parameters_individual.csv</code> is written with <strong>exactly the PBPK schema</strong>: <code>T50, IndividualId, Cmax, AUC_inf, AUC_tEnd</code>. That schema match is what lets step 04 run <em>identical</em> BE math on both sources. (<code>poppk_nca_diagnostics.csv</code> keeps the extra diagnostic columns.) The script also prints per-formulation <strong>geometric-mean</strong> Cmax / AUC_tEnd / AUC_inf and mean % extrapolated.</p>
+<blockquote class="blockquote">
+<p>The AUC convention is deliberately matched to the PK-Sim NCA: AUC_tEnd over 0–24 h, AUC_inf with terminal extrapolation, so flip-flop / extrapolation behaviour is comparable between the two methods. AUC_0-t is the preferred BE endpoint for XR / high-extrapolation products; AUC_inf is reported alongside.</p>
+</blockquote>
+<hr>
+</section>
+<section id="step-04-the-headline-deliverable-pbpk-vs-poppk-decision-equivalence-overlay-04_be_safespace_overlay.jl" class="level2">
+<h2 class="anchored" data-anchor-id="step-04-the-headline-deliverable-pbpk-vs-poppk-decision-equivalence-overlay-04_be_safespace_overlay.jl">6. Step 04 — the headline deliverable: PBPK vs PopPK decision-equivalence overlay (<code>04_be_safespace_overlay.jl</code>)</h2>
+<p>Loads <strong>both</strong> per-subject endpoint tables — <code>data/pbpk_pk_parameters_individual.csv</code> (PBPK) and <code>output/poppk_pk_parameters_individual.csv</code> (PopPK) — and runs the <strong>same</strong> TOST / VBE / safe-space machinery (<code>src/be_utils.jl</code>, the exact PBPK-side code) on each, then overlays.</p>
+<section id="gmrt50-with-90-ci-both-methods" class="level3">
+<h3 class="anchored" data-anchor-id="gmrt50-with-90-ci-both-methods">6.1 GMR(T50) with 90% CI — both methods</h3>
+<p>For every T50 arm and every endpoint, a <strong>paired (crossover) average-BE</strong> test vs the reference (T50 = 3.0 h) using within-subject log-differences (<code>be_paired</code>):</p>
+<ul>
+<li><code>d = log(test) − log(ref)</code> over subjects with finite, positive paired values;</li>
+<li><code>GMR = exp(mean d)</code>; 90% CI from a t-distribution (TOST, two one-sided tests at α=0.05);</li>
+<li><strong>BE pass</strong> if the whole 90% CI ⊂ <strong>[0.80, 1.25]</strong> (FDA/EMA average-BE limits).</li>
+</ul>
+<p>→ <code>be_overlay_gmr.csv</code> and <code>fig_overlay_gmr.png</code> (GMR vs T50, PBPK firebrick vs PopPK royalblue, dodged so CIs don’t overlap, with the 0.8–1.25 band shaded).</p>
+</section>
+<section id="virtual-be-vbe-power-safe-space-curves-both-methods" class="level3">
+<h3 class="anchored" data-anchor-id="virtual-be-vbe-power-safe-space-curves-both-methods">6.2 Virtual BE (VBE) power / safe-space curves — both methods</h3>
+<p>For each endpoint, a <strong>power curve over a fine T50 grid</strong> (<code>anchors[1]..anchors[end]</code>, step <strong>0.05 h</strong>), at <strong>two study sizes n = 48 and n = 86</strong>:</p>
+<ul>
+<li>The 8 anchor T50s give each subject a per-formulation metric; values <strong>between anchors are log-interpolated</strong> (<code>interp_log</code>) so power can be evaluated on the fine grid.</li>
+<li>At each grid T50, <code>vbe_replicate</code> runs <strong>500 bootstrap trials</strong>: resample <code>n_subj</code> subjects <strong>with replacement</strong> from the 24 paired physiologies (n&gt;24 ⇒ bootstrap), inject a <strong>within-subject residual CV</strong> (the <em>third</em> added variability), run the paired TOST, and record the <strong>pass fraction = power</strong>.</li>
+<li><strong>Joint endpoint</strong> (<code>vbe_replicate_joint</code>): a trial passes only if <strong>both</strong> Cmax and AUC₀–t pass.</li>
+</ul>
+<p><strong>The within-subject CVs injected for VBE</strong> (<code>WSV_CV</code>, from FDA NDA 212595 ClinPharm review, metformin ER): <strong>Cmax 0.122, AUC_inf 0.114, AUC_tEnd 0.112</strong>. A high-variability sensitivity set (<code>WSV_CV_IR</code>, immediate-release upper bound) is also available: <strong>Cmax 0.237, AUC 0.147</strong>. The CV is converted to a log-scale SD (<code>sw = sqrt(log(cv²+1))</code>) and applied multiplicatively to both test and reference draws each trial.</p>
+<p><strong>Safe-space boundary</strong> = the contiguous T50 range around the reference where <strong>power ≥ 0.80</strong> (<code>safe_bounds</code> walks outward from the ref T50 while power stays ≥ target).</p>
+<p>→ <code>fig_overlay_safespace_&lt;endpoint&gt;.png</code> for Cmax, AUC_tEnd, AUC_inf, and the joint endpoint (power curves PBPK vs PopPK with their ≥80%-power boundaries marked as dotted verticals), and the boundary comparison table <code>safe_space_overlay_boundaries.csv</code> (<code>endpoint, source, n_subj, ss_lo, ss_hi</code>).</p>
+</section>
+<section id="what-decision-equivalence-means-here" class="level3">
+<h3 class="anchored" data-anchor-id="what-decision-equivalence-means-here">6.3 What “decision equivalence” means here</h3>
+<p>The question the overlay answers: <strong>do PBPK and PopPK put the safe-space boundaries in the same place and reach the same BE conclusions?</strong> Same anchors, same reference, same TOST, same VBE CVs, same NCA conventions — the <em>only</em> difference between the two curves is the source of the per-subject Cmax/AUC (direct PK-Sim NCA vs fit-then-NCA through a PopPK model). Any divergence is therefore attributable to the PopPK abstraction (sparse sampling + structural model + estimation), which is exactly what the study is measuring.</p>
+<hr>
+</section>
+</section>
+<section id="how-t50-is-handled-in-the-poppk-model-vs-the-pbpk-model-your-specific-question" class="level2">
+<h2 class="anchored" data-anchor-id="how-t50-is-handled-in-the-poppk-model-vs-the-pbpk-model-your-specific-question">7. How T50 is handled in the PopPK model vs the PBPK model (your specific question)</h2>
+<p>This is the subtle and important part, so it gets its own section.</p>
+<section id="on-the-pk-sim-pbpk-side" class="level3">
+<h3 class="anchored" data-anchor-id="on-the-pk-sim-pbpk-side">On the PK-Sim / PBPK side</h3>
+<p>T50 is a <strong>mechanistic input</strong>: it is the Weibull median dissolution time of the formulation. You <em>set</em> it, PK-Sim dissolves the tablet accordingly, and the physiology turns that release profile into plasma concentrations. Each T50 value is a separate population simulation. The BE endpoints (Cmax/AUC) come straight from NCA of those mechanistic profiles. T50 is a <strong>cause</strong> in the model.</p>
+</section>
+<section id="on-the-poppk-side" class="level3">
+<h3 class="anchored" data-anchor-id="on-the-poppk-side">On the PopPK side</h3>
+<p>T50 is <strong>never estimated and never appears as a structural parameter.</strong> It is carried purely as a <strong>label/covariate</strong> (<code>covariates = [:T50, :IndividualId]</code>). Its role is bookkeeping:</p>
+<ol type="1">
+<li><strong>It defines the arms.</strong> Step 02 fits the 1-cmt model <strong>independently per T50 arm</strong>. So the formulation’s effect on release is absorbed entirely into that arm’s <strong>estimated parameters</strong> — chiefly the <strong>apparent absorption rate <code>ka</code></strong> (and to a lesser extent lag). The model comment states this explicitly: <em>the in-vitro release T50 maps inversely onto the apparent ka.</em> A slower-releasing (larger-T50) formulation is reconstructed by the PopPK fit as a smaller apparent <code>ka</code>. <strong>T50 → ka is implicit, via independent fitting — not a fitted regression and not an estimated covariate effect.</strong></li>
+<li><strong>It is the x-axis</strong> of every downstream comparison (GMR vs T50, power vs T50, safe-space boundaries in T50 units), so the PopPK results can be laid directly over the PBPK results on the same formulation axis.</li>
+</ol>
+</section>
+<section id="so-how-are-the-per-formulation-t50-results-regenerated-in-the-poppk-model-vs-pk-sim" class="level3">
+<h3 class="anchored" data-anchor-id="so-how-are-the-per-formulation-t50-results-regenerated-in-the-poppk-model-vs-pk-sim">So how are the per-formulation (T50) results “regenerated” in the PopPK model vs PK-Sim?</h3>
+<p>They are regenerated by the <strong>fit → re-simulate → re-NCA chain</strong>, not by re-deriving T50:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Stage</th>
+<th>PK-Sim / PBPK</th>
+<th>PopPK (Pumas)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Formulation effect</td>
+<td>T50 set mechanistically (Weibull dissolution)</td>
+<td>absorbed into the arm’s estimated <code>ka</code>/lag (T50 only a label)</td>
+</tr>
+<tr class="even">
+<td>Per-subject profile</td>
+<td>mechanistic PBPK ODE, dense 0–24 h</td>
+<td>re-simulated dense IPRED 0–24 h from the fitted EBEs (<code>Ka, CL, Vc</code>)</td>
+</tr>
+<tr class="odd">
+<td>Per-subject Cmax/AUC</td>
+<td>PK-Sim NCA</td>
+<td><code>nca_lite</code> NCA on the IPRED (identical definitions)</td>
+</tr>
+<tr class="even">
+<td>GMR(T50), power(T50), safe space</td>
+<td>TOST/VBE on PBPK endpoints</td>
+<td><strong>same</strong> TOST/VBE on PopPK endpoints</td>
+</tr>
+</tbody>
+</table>
+<p>In other words, the PopPK model regenerates the <strong>same observable BE quantities at each T50</strong> (the per-subject Cmax/AUC, and from them GMR and the safe-space boundaries), but it does so by <em>estimating a PK model from a sparse noisy study and predicting from it</em>, whereas PK-Sim produces them mechanistically. The overlay then asks whether those two regeneration routes agree.</p>
+<blockquote class="blockquote">
+<p>If you ever want an <em>explicit</em> T50→ka relationship (rather than the implicit one from independent per-arm fits), the README’s deferred variant — a joint model with T50 as a categorical (or continuous) covariate on <code>ka</code> — would estimate it directly. The baseline deliberately keeps the arms independent.</p>
+</blockquote>
+<hr>
+</section>
+</section>
+<section id="exactly-what-was-added-vs-reused-quick-reference-for-the-question-did-we-refit-what-bsvs" class="level2">
+<h2 class="anchored" data-anchor-id="exactly-what-was-added-vs-reused-quick-reference-for-the-question-did-we-refit-what-bsvs">8. Exactly what was added vs reused (quick-reference for the question “did we refit / what BSVs”)</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Question</th>
+<th>Answer</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Did we re-fit a model?</td>
+<td><strong>Yes.</strong> Step 02 fits a 1-cmt first-order-absorption-with-lag PopPK model <strong>per formulation arm</strong> with <strong>FOCE</strong>, from the sparse noisy BE dataset. No PBPK parameter is reused.</td>
+</tr>
+<tr class="even">
+<td>Did we re-simulate?</td>
+<td><strong>Yes.</strong> Step 02 reconstructs dense 0–24 h individual predictions (IPRED) from the fitted per-subject EBEs (<code>predict(fpm; obstimes=0:0.05:24)</code>).</td>
+</tr>
+<tr class="odd">
+<td>What residual error was added to the data?</td>
+<td><strong>Proportional 15% CV</strong> assay/intra-occasion noise, added to each sparse sample in step 01 (seed 20260610).</td>
+</tr>
+<tr class="even">
+<td>What BSV/IIV is in the PopPK model?</td>
+<td><strong>Log-normal IIV (η) on ka, CL, Vc</strong>, diagonal Ω (init 0.09 each ≈ 30% CV). <strong>No IIV on lag</strong> (fixed effect, for stability). Residual estimated as proportional <code>σ_p</code> (init 0.15).</td>
+</tr>
+<tr class="odd">
+<td>What within-subject CV is added for VBE?</td>
+<td><strong>Cmax 0.122, AUC_tEnd 0.112, AUC_inf 0.114</strong> (FDA NDA 212595 metformin ER); IR sensitivity set 0.237 / 0.147 available. Injected as multiplicative log-normal noise in the 500-trial bootstrap.</td>
+</tr>
+<tr class="even">
+<td>How is T50 regenerated in the PK model vs PBPK?</td>
+<td>T50 is <strong>not</strong> regenerated/estimated in PopPK — it is a label. The formulation effect is absorbed into each arm’s estimated <strong>apparent ka</strong>. Per-T50 BE results are regenerated via fit→IPRED→NCA→TOST and overlaid on the mechanistic PBPK results. See §7.</td>
+</tr>
+<tr class="odd">
+<td>Are the BE statistics the same on both sides?</td>
+<td><strong>Yes — identical code</strong> (<code>src/be_utils.jl</code>): same TOST, same 0.80–1.25 limits, same 90% CI, same VBE (500 trials, n=48/86), same within-subject CVs, reference T50 = 3.0 h.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="output-inventory-programspoppk_pumasoutput" class="level2">
+<h2 class="anchored" data-anchor-id="output-inventory-programspoppk_pumasoutput">9. Output inventory (<code>programs/poppk_pumas/output/</code>)</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Produced by</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sparse_be_dataset.csv</code></td>
+<td>01</td>
+<td>simulated BE study (Pumas NONMEM format)</td>
+</tr>
+<tr class="even">
+<td><code>poppk_param_estimates.csv</code></td>
+<td>02</td>
+<td>population params (tvka/tvcl/tvvc/tvlag, Ω diagonals, σ_p) + OFV per arm</td>
+</tr>
+<tr class="odd">
+<td><code>poppk_icoef.csv</code></td>
+<td>02</td>
+<td>per-subject EBEs Ka/CL/Vc per arm</td>
+</tr>
+<tr class="even">
+<td><code>poppk_ipred_profiles.csv</code></td>
+<td>02</td>
+<td>dense individual predictions, 0–24 h</td>
+</tr>
+<tr class="odd">
+<td><code>poppk_pk_parameters_individual.csv</code></td>
+<td>03</td>
+<td>PopPK per-subject Cmax/AUC_inf/AUC_tEnd (<strong>PBPK schema</strong>)</td>
+</tr>
+<tr class="even">
+<td><code>poppk_nca_diagnostics.csv</code></td>
+<td>03</td>
+<td>+ Tmax, % extrapolated, λz adj-R²</td>
+</tr>
+<tr class="odd">
+<td><code>be_overlay_gmr.csv</code> / <code>fig_overlay_gmr.png</code></td>
+<td>04</td>
+<td>GMR(T50) ± 90% CI, both methods</td>
+</tr>
+<tr class="even">
+<td><code>safe_space_overlay_boundaries.csv</code> / <code>fig_overlay_safespace_*.png</code></td>
+<td>04</td>
+<td>safe-space boundary table + overlay figures</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="how-to-run" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-run">10. How to run</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># from programs/poppk_pumas/ on a licensed Pumas / JuliaHub environment</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">julia</span> <span class="at">--project</span><span class="op">=</span>. <span class="at">-e</span> <span class="st">'using Pkg; Pkg.instantiate()'</span>   <span class="co"># first time only</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="ex">julia</span> <span class="at">--project</span><span class="op">=</span>. run_all.jl                            <span class="co"># runs 01 → 04</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># or step by step: scripts/01_build_dataset.jl … 04_be_safespace_overlay.jl</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Only step 02 needs the licensed Pumas; 01/03/04 use open packages. If <code>icoef</code>/<code>predict</code> field names differ on your Pumas version, adjust step 02 (see README “If something breaks”), or use the closed-form 1-cmt fallback (§4.4) to regenerate the profiles analytically.</p>
+<hr>
+</section>
+<section id="deferred-variants-coded-hooks-not-in-the-baseline" class="level2">
+<h2 class="anchored" data-anchor-id="deferred-variants-coded-hooks-not-in-the-baseline">11. Deferred variants (coded hooks, not in the baseline)</h2>
+<ol type="1">
+<li><strong>Truly-sparse schedule (~6 pts):</strong> set <code>SCHEDULE = SPARSE_SCHEDULE</code> in <code>01</code> — stresses the fit, demonstrates robustness under limited sampling.</li>
+<li><strong>Weibull / transit-compartment absorption:</strong> replace the <code>@dynamics</code> block in <code>src/poppk_model.jl</code> with a transit chain or Weibull absorption to mirror the PK-Sim in-vitro release mechanism directly (more parameters, closer mechanism).</li>
+<li><strong>Joint T50-covariate model:</strong> fit all arms together with T50 as a covariate on <code>ka</code> to get an explicit T50→ka relationship instead of independent per-arm fits.</li>
+</ol>
+<hr>
+<p><em>Sources: <code>programs/poppk_pumas/{README.md, run_all.jl, src/*.jl, scripts/*.jl}</code>, project notes (not included), and the data files under <code>programs/poppk_pumas/data/</code>. Authored 2026-06-25.</em></p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

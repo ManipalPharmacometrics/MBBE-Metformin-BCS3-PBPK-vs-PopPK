@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>methodology_metformin_mbbe</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="METHODOLOGY_metformin_MBBE_files/libs/clipboard/clipboard.min.js"></script>
+<script src="METHODOLOGY_metformin_MBBE_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="METHODOLOGY_metformin_MBBE_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="METHODOLOGY_metformin_MBBE_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="METHODOLOGY_metformin_MBBE_files/libs/quarto-html/popper.min.js"></script>
+<script src="METHODOLOGY_metformin_MBBE_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="METHODOLOGY_metformin_MBBE_files/libs/quarto-html/anchor.min.js"></script>
+<link href="METHODOLOGY_metformin_MBBE_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="METHODOLOGY_metformin_MBBE_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="METHODOLOGY_metformin_MBBE_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="METHODOLOGY_metformin_MBBE_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="METHODOLOGY_metformin_MBBE_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="metformin-xr-virtual-bioequivalence-methodology-in-plain-language" class="level1">
+<h1>Metformin XR virtual bioequivalence — methodology in plain language</h1>
+<p><strong>What this project does, in one sentence:</strong> we use two different computer models of metformin extended-release (XR) tablets to answer the same regulatory question — <em>“how much can the tablet’s release rate drift before it would fail a bioequivalence (BE) study?”</em> — and we check whether the two models give the <strong>same answer</strong>.</p>
+<p>The two models are:</p>
+<ol type="1">
+<li>a <strong>PBPK</strong> model (physiology-based, built in <strong>PK-Sim</strong>), and</li>
+<li>a <strong>PopPK</strong> model (population-PK, fitted in <strong>Pumas</strong>).</li>
+</ol>
+<p>The single formulation “knob” we turn is <strong>T50</strong> — the Weibull <em>release time</em> of the tablet (hours). Bigger T50 = slower release. Everything below explains, in simple terms, exactly what was done on each side and how they are compared.</p>
+<blockquote class="blockquote">
+<p><strong>A note on the plan.</strong> The intended PopPK absorption model is the <strong>Weibull-release model</strong> described in Part 2 — the same release law the PBPK tablet uses. This is the baseline throughout; a simpler first-order-absorption form is retained only as a secondary sensitivity model.</p>
+</blockquote>
+<hr>
+<section id="the-concepts-you-need-first-30-second-versions" class="level2">
+<h2 class="anchored" data-anchor-id="the-concepts-you-need-first-30-second-versions">0. The concepts you need first (30-second versions)</h2>
+<ul>
+<li><strong>Bioequivalence (BE).</strong> Two products are “bioequivalent” if the body is exposed to the drug almost identically. Practically: the <strong>90% confidence interval</strong> of the test/reference ratio (the <strong>GMR</strong>) for peak concentration (<strong>Cmax</strong>) and total exposure (<strong>AUC</strong>) must sit entirely inside <strong>0.80–1.25</strong>. The test is the <strong>two one-sided tests (TOST)</strong> procedure.</li>
+<li><strong>Virtual / model-based BE (VBE / MBBE).</strong> Run that BE study on a <em>simulated</em> population instead of in real people.</li>
+<li><strong>Safe space.</strong> The range of the formulation knob (here T50) where the product not only <em>passes</em> BE but a realistic-sized study has <strong>≥ 80% power</strong> to pass. The safe space is narrower than the raw BE range, because power falls off before the ratio actually leaves 0.80–1.25.</li>
+<li><strong>Why two models?</strong> PBPK and PopPK are the two standard MBBE routes. If they place the safe-space boundaries in the same place, that is strong evidence the boundaries are real and not an artifact of one modelling choice. That agreement is our headline deliverable — <strong>“decision equivalence.”</strong></li>
+</ul>
+<p>We are reproducing the <em>method</em> of <strong>Morris et al., AAPS J 2026</strong> (a long-acting injectable safe-space + type-I-error paper), but applied to an <strong>oral MR</strong> drug.</p>
+<hr>
+</section>
+<section id="the-pbpk-side-pk-sim-build-the-physiology-dissolve-the-tablet" class="level2">
+<h2 class="anchored" data-anchor-id="the-pbpk-side-pk-sim-build-the-physiology-dissolve-the-tablet">1. The PBPK side (PK-Sim) — “build the physiology, dissolve the tablet”</h2>
+<p><strong>Goal:</strong> a mechanistic model where the drug moves through actual organs, and the only thing we change between formulations is how fast the tablet releases the drug.</p>
+<p>All modelling and simulation on this side is done entirely in <strong>PK-Sim</strong> (the small-molecule PBPK builder). No other tool is used — no MoBi, no scripting layer — everything is built and run in the PK-Sim GUI.</p>
+<section id="what-a-pbpk-model-is-and-what-pk-sim-gives-us" class="level3">
+<h3 class="anchored" data-anchor-id="what-a-pbpk-model-is-and-what-pk-sim-gives-us">1.1 What a PBPK model is (and what PK-Sim gives us)</h3>
+<p>Unlike a compartmental model (a few abstract boxes fit to data), a PBPK model represents the body as its <strong>actual organs</strong> — gut, liver, kidney, muscle, fat, brain, etc. — each with a real blood flow, volume, and tissue-to-plasma partitioning. Drug-specific properties (molecular weight, lipophilicity, solubility, permeability, protein binding, and transporter/enzyme kinetics) drive how the drug moves through that physiology. PK-Sim holds the physiology database and assembles the model from a small set of building blocks: <strong>Compound</strong> (the drug), <strong>Formulation</strong> (how it is released), <strong>Administration Protocol</strong> (dose/route), <strong>Individual</strong> or <strong>Population</strong> (the physiology), and <strong>Simulation</strong> (which ties them together).</p>
+</section>
+<section id="the-starting-model-a-published-validated-metformin-model" class="level3">
+<h3 class="anchored" data-anchor-id="the-starting-model-a-published-validated-metformin-model">1.2 The starting model — a published, validated metformin model</h3>
+<p>We did <strong>not</strong> build metformin from scratch. We loaded the <strong>published open-source metformin PBPK model</strong> (a PK-Sim project snapshot) and ran it in PK-Sim:</p>
+<ul>
+<li><strong>Model source:</strong> https://github.com/Open-Systems-Pharmacology/Metformin-Model</li>
+<li><strong>Model paper:</strong> Hanke et al., <em>Clin Pharmacokinet</em> 2020 — https://doi.org/10.1007/s40262-020-00896-w</li>
+<li>It was validated against <strong>39 clinical studies</strong> (0.001–2550 mg, oral + IV). We confirmed the install by reproducing the model’s own <strong>immediate-release validation</strong> (the Tucker 1981 clinical overlay) before changing anything. The model ships covering <strong>oral immediate-release and IV only</strong> — the disposition (distribution + clearance) backbone comes for free; the <strong>extended-release layer is what we add</strong> (§1.4).</li>
+</ul>
+</section>
+<section id="the-drug-how-metformin-behaves-in-the-body" class="level3">
+<h3 class="anchored" data-anchor-id="the-drug-how-metformin-behaves-in-the-body">1.3 The drug — how metformin behaves in the body</h3>
+<p>The concrete metformin properties that matter for this study (all carried in the PK-Sim Compound):</p>
+<ul>
+<li><strong>Small, hydrophilic base</strong>, MW ≈ 129.16 g/mol (free base); high aqueous solubility but <strong>low passive permeability</strong> → a BCS class III drug (dissolves easily, crosses membranes poorly).</li>
+<li><strong>Absorption is transporter-mediated and occurs high in the gut</strong> — there is an effective <strong>absorption window</strong>: drug that has not been released before it passes the upper small intestine is absorbed less well. This matters for slow-release tablets (see limitations).</li>
+<li><strong>Cleared almost entirely by the kidney</strong> (renal secretion, essentially no hepatic metabolism), via organic-cation transporters. The model carries the canonical Hanke transporter set — <strong>OCT1, OCT2, MATE1, PMAT</strong> (renal/hepatic/intestinal cation transport) — which is what makes metformin’s disposition mechanistic rather than a fitted clearance.</li>
+</ul>
+<p>Because clearance is renal and transporter-mediated and does <strong>not</strong> depend on how the tablet releases, <strong>clearance and volume are the same for every formulation</strong> — a fact we rely on later when interpreting the PopPK fit (§2.3).</p>
+</section>
+<section id="add-the-extended-release-xr-tablet-as-a-weibull-dissolution" class="level3">
+<h3 class="anchored" data-anchor-id="add-the-extended-release-xr-tablet-as-a-weibull-dissolution">1.4 Add the extended-release (XR) tablet as a Weibull dissolution</h3>
+<p>Metformin XR (e.g.&nbsp;Glucophage XR) is a slow-release matrix tablet. In PK-Sim we attach a <strong>Weibull dissolution Formulation</strong> to the compound — the fraction of drug released by time <em>t</em>:</p>
+<pre><code>F(t) = 1 − exp( −((t − lag)/T50)^β )</code></pre>
+<ul>
+<li><strong>T50</strong> = the Weibull <strong>scale</strong> = the release time. <strong>This is the single formulation knob (the CQA) we vary.</strong></li>
+<li><strong>β</strong> = the Weibull <strong>shape</strong> = how S-shaped the release is. <strong>We hold β fixed at 1.0 for every tablet</strong> — so across the study only the <em>scale</em> changes, not the shape.</li>
+<li>Reference T50 ≈ <strong>3 h</strong> (representative of Glucophage XR in-vitro release; cf.&nbsp;Timmins et al., <em>Clin Pharmacokinet</em> 2005; Stepensky et al., <em>Biopharm Drug Dispos</em> 2002).</li>
+</ul>
+<p><strong>Dose convention (used consistently for every simulation):</strong> a clinical 500 mg metformin <strong>HCl</strong> tablet = <strong>390 mg free base</strong> (factor 0.78; MW base 129.16 vs salt 165.62). PK-Sim doses in free base, single dose, <strong>fasted</strong>, 24 h simulation. Keeping this identical across all tablets is what makes the test-vs-reference comparison valid.</p>
+</section>
+<section id="the-formulation-sweep" class="level3">
+<h3 class="anchored" data-anchor-id="the-formulation-sweep">1.5 The formulation sweep</h3>
+<p>We built <strong>8 tablets</strong> by changing only T50: <strong>1.0, 2.0, 3.0, 3.5, 4.0, 5.0, 6.0, 7.0 h</strong> (3.0 h = reference). β = 1.0, dose, population and everything else are held fixed — so any difference in the blood profile is attributable to release rate alone.</p>
+</section>
+<section id="the-virtual-population" class="level3">
+<h3 class="anchored" data-anchor-id="the-virtual-population">1.6 The virtual population</h3>
+<p>For each of the 8 tablets we ran a <strong>population simulation of 24 virtual subjects</strong> built from PK-Sim’s population module:</p>
+<ul>
+<li>Template: <strong>European healthy adults</strong>, ages <strong>18–55</strong>, BMI <strong>18.5–30</strong>, <strong>50/50 male/female</strong>.</li>
+<li>PK-Sim varies each subject’s physiology (organ sizes, blood flows, transporter expression) in an internally consistent way, so the 24 subjects are genuinely different bodies.</li>
+<li><strong>Crucially, PK-Sim uses the same 24 physiologies under every tablet.</strong> So test-vs-reference is a <strong>fully paired 2×2 crossover</strong> (the same person effectively “takes” both tablets) — the cleanest possible average-BE setting, with no between-subject noise from mismatched arms.</li>
+</ul>
+<p>Output per tablet: dense <strong>peripheral-venous plasma</strong> concentration–time curves (a 3-minute grid, 0–24 h) for all 24 subjects, exported to CSV — the input to everything downstream.</p>
+</section>
+<section id="known-limitations-scope-stated-honestly" class="level3">
+<h3 class="anchored" data-anchor-id="known-limitations-scope-stated-honestly">1.7 Known limitations / scope (stated honestly)</h3>
+<ul>
+<li><strong>This is a methodology platform, not an absolute-accuracy exercise.</strong> The population over-predicts absolute metformin exposure by roughly 2-fold vs clinic. That is deliberately accepted: bioequivalence is a <em>relative</em> test/reference comparison, so a shared absolute offset cancels and does not affect the GMR/TOST conclusions.</li>
+<li><strong>Slow tablets show flip-flop kinetics.</strong> When release is slower than elimination, the terminal decline reflects the <em>release</em> rate, not true elimination. This inflates the extrapolated <strong>AUC_inf</strong> for the slowest tablets, so <strong>AUC₀–t</strong> is the primary AUC endpoint (AUC_inf is reported alongside but treated cautiously).</li>
+<li><strong>The absorption window caps the slowest tablets.</strong> With very slow release, some drug passes the absorption window before dissolving (fraction absorbed falls from ~0.8 toward ~0.5), which is a real mechanistic feature of metformin, not a modelling error.</li>
+</ul>
+</section>
+<section id="be-endpoints-straight-from-the-pbpk-profiles" class="level3">
+<h3 class="anchored" data-anchor-id="be-endpoints-straight-from-the-pbpk-profiles">1.8 BE endpoints straight from the PBPK profiles</h3>
+<p>For each subject we compute, by non-compartmental analysis (NCA): - <strong>Cmax</strong> (peak), - <strong>AUC₀–t</strong> (exposure over 0–24 h; the preferred endpoint for XR), and - <strong>AUC_inf</strong> (extrapolated to infinity).</p>
+<p>These per-subject numbers are the PBPK “truth” we later compare against.</p>
+<p><em>Software:</em> <strong>PK-Sim</strong> — the small-molecule PBPK tool; docs https://docs.open-systems-pharmacology.org/working-with-pk-sim/pk-sim-tutorial. The metformin model was loaded as a PK-Sim project snapshot from the source in §1.2.</p>
+<hr>
+</section>
+</section>
+<section id="the-poppk-side-pumas-pretend-you-only-have-a-clinical-study-and-fit-a-model" class="level2">
+<h2 class="anchored" data-anchor-id="the-poppk-side-pumas-pretend-you-only-have-a-clinical-study-and-fit-a-model">2. The PopPK side (Pumas) — “pretend you only have a clinical study, and fit a model”</h2>
+<p><strong>Goal:</strong> answer the honest real-world question: <em>if all you had was an ordinary, sparse clinical BE study, would a fitted PopPK model reach the same BE decision the mechanistic PBPK model does?</em></p>
+<p>So we deliberately <strong>throw away</strong> the PBPK detail and rebuild a PK model from a realistic, noisy, sparsely-sampled dataset.</p>
+<section id="turn-the-pbpk-truth-into-a-realistic-clinical-study" class="level3">
+<h3 class="anchored" data-anchor-id="turn-the-pbpk-truth-into-a-realistic-clinical-study">2.1 Turn the PBPK “truth” into a realistic clinical study</h3>
+<ol type="1">
+<li><strong>Sparse-sample</strong> each subject’s dense PBPK curve at a normal clinical BE schedule: 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 16, 24 h (13 samples).</li>
+<li><strong>Add measurement noise:</strong> a <strong>15% proportional</strong> (assay) error on each sample. Without noise the simulated study is unrealistically clean and the power/type-I analysis is meaningless — the same point Morris and the FDA guidance stress.</li>
+<li>Write it out in standard NONMEM/Pumas format (dose row + observation rows per subject), keeping the T50 label and the subject id (to preserve crossover pairing).</li>
+</ol>
+</section>
+<section id="the-poppk-model-a-weibull-release-absorption-model-the-original-plan" class="level3">
+<h3 class="anchored" data-anchor-id="the-poppk-model-a-weibull-release-absorption-model-the-original-plan">2.2 The PopPK model — a <strong>Weibull-release absorption</strong> model (the original plan)</h3>
+<p>This is the key modelling choice. On the PBPK side the tablet dissolves by a Weibull law; <strong>we use that same Weibull law as the absorption input on the PopPK side</strong>, so the two models speak the same mechanistic language.</p>
+<p>Metformin XR is <strong>dissolution/release rate-limited</strong> (its slow tail — “flip-flop” kinetics — is set by how slowly the tablet releases, not by elimination). So we let the Weibull release <em>be</em> the absorption, with no separate absorption-rate constant (there is nothing extra to identify). The model is a <strong>1-compartment disposition fed by a Weibull release</strong>:</p>
+<pre><code>release rate constant   h(t) = (γ/α) · ((t − lag)/α)^(γ − 1)      (for t &gt; lag)
+depot (undissolved drug) Depot'   = −h(t)·Depot,   Depot(0) = Dose
+central (in body)        Central' =  h(t)·Depot − (CL/Vc)·Central
+concentration            C(t)     =  Central / Vc</code></pre>
+<p>This makes <code>Depot(t) = Dose · exp(−((t−lag)/α)^γ)</code> — <strong>exactly the Weibull release curve the PBPK side uses.</strong> So:</p>
+<ul>
+<li><strong>α</strong> (the fitted in-vivo release scale) is the direct analog of the PBPK <strong>T50</strong> — it varies with formulation;</li>
+<li><strong>γ</strong> is the in-vivo <strong>input shape</strong> — the in-vitro dissolution (PBPK β = 1.0) folded together with gut absorption and transit; it is estimated, <em>not</em> fixed to β = 1 (in the per-arm baseline it comes out ≈ 1.7; in the disposition-constrained IVIVC variant it is a single shared value ≈ 0.8 — see §4). It does not vary by formulation (neither does the shape on the PBPK side);</li>
+<li><strong>CL, Vc</strong> are clearance and volume (disposition).</li>
+</ul>
+<p>Because it uses the same release law, the PopPK model <em>can reproduce the PBPK profile shape</em> at each formulation — which the older first-order model could not.</p>
+<p><strong>On the 1-compartment disposition.</strong> We use one central compartment. In the published metformin population-PK literature both structures appear: most models are <strong>two-compartment</strong> (metformin shows a mild biexponential decline and red-blood-cell uptake), but a <strong>one-compartment model with first-order absorption and lag is documented as adequate for immediate-release metformin</strong> (e.g.&nbsp;the review by Wang et al.&nbsp;2022, and the Korean FDC analysis, Chung/Kim et al. 2018). For this <em>relative</em> BE comparison the one-compartment disposition is a reasonable, transparent choice; a two-compartment disposition is the natural sensitivity/extension if the terminal phase needs it.</p>
+<p><strong>Variability added in the model:</strong> - <strong>Between-subject variability (IIV):</strong> log-normal random effects on <strong>α, CL, Vc</strong> (diagonal Ω). γ and lag are kept as fixed effects for stability with sparse data. - <strong>Residual error:</strong> proportional (the model’s estimate of the 15% assay noise).</p>
+</section>
+<section id="fit-the-model-this-is-a-real-re-fit" class="level3">
+<h3 class="anchored" data-anchor-id="fit-the-model-this-is-a-real-re-fit">2.3 Fit the model — this is a real re-fit</h3>
+<p>Each formulation arm is fit by population maximum-likelihood estimation. We reuse <strong>no</strong> PBPK parameter — the model is estimated from the sparse noisy data alone, exactly as it would be with a real clinical study.</p>
+<p><strong>One structural caveat — release vs disposition (flip-flop).</strong> Metformin XR is release-rate-limited, so its terminal decline is set by the slower of two processes (release vs elimination). In a one-compartment model these two are <strong>not separately identifiable from a single arm</strong> — “slow release + fast elimination” and “fast release + slow elimination” produce the same curve. If every arm is allowed its own clearance and volume, the fit can absorb the formulation effect into disposition and leave the release scale α nearly flat. The physiologically correct constraint removes the ambiguity: <strong>clearance (CL) and volume (Vc) are properties of the drug and subject, not of the tablet’s release rate, so they are held formulation-independent</strong> (shared across arms). Only the release <strong>scale α</strong> then varies by formulation (γ stays shared), and α becomes an identifiable, monotonic in-vivo analog of T50 (an in-silico IVIVC). Constraining disposition also smooths the endpoint-vs-formulation relationship, so it can shift the safe-space boundaries relative to an unconstrained per-arm fit — the release-vs-disposition split and the safe space are coupled. The safe-space comparison should therefore be reported from a single, consistent fit, stating which one.</p>
+</section>
+<section id="re-simulate-and-re-derive-the-same-endpoints" class="level3">
+<h3 class="anchored" data-anchor-id="re-simulate-and-re-derive-the-same-endpoints">2.4 Re-simulate and re-derive the same endpoints</h3>
+<p>From the fit we reconstruct each subject’s <strong>dense predicted profile (0–24 h)</strong>, then run the <strong>same NCA</strong> as the PBPK side to get per-subject <strong>Cmax / AUC₀–t / AUC_inf</strong> — same column layout, same definitions. Now the two methods produce endpoints that can be compared apples-to-apples.</p>
+<hr>
+</section>
+</section>
+<section id="comparing-the-two-the-safe-space-and-decision-equivalence" class="level2">
+<h2 class="anchored" data-anchor-id="comparing-the-two-the-safe-space-and-decision-equivalence">3. Comparing the two — the safe space and “decision equivalence”</h2>
+<p>Both sides now have per-subject Cmax/AUC at each T50. We run the <strong>identical</strong> statistics code on each:</p>
+<ol type="1">
+<li><strong>GMR(T50) with 90% CI</strong> — paired TOST vs the reference (T50 = 3 h). BE passes if the whole 90% CI is inside 0.80–1.25.</li>
+<li><strong>Virtual BE power curves</strong> — for a fine grid of T50 values and two realistic study sizes (<strong>n = 48</strong> and <strong>n = 86</strong>), resample crossover trials (bootstrap of the 24 paired subjects), inject the <strong>within-subject variability</strong> measured for metformin ER (Cmax CV ≈ 12.2%, AUC ≈ 11.2%; source: FDA NDA 212595 clinical-pharmacology review), run TOST, and record the fraction of trials that pass = <strong>power</strong>.</li>
+<li><strong>Safe space</strong> = the T50 range around the reference where power ≥ 80%.</li>
+<li>A <strong>joint</strong> endpoint (must pass both Cmax and AUC₀–t) is also computed.</li>
+</ol>
+<p>Because the <em>only</em> difference between the PBPK and PopPK curves is <strong>how the per-subject Cmax/AUC were produced</strong> (mechanistic NCA vs fit-then-NCA), any gap between them is exactly the effect of using a fitted sparse-data PopPK model instead of the full physiology. That gap is what “decision equivalence” measures.</p>
+<hr>
+</section>
+<section id="what-we-found" class="level2">
+<h2 class="anchored" data-anchor-id="what-we-found">4. What we found</h2>
+<p><strong>Decision equivalence (the primary result) — from the licensed Pumas fit.</strong> The PopPK model was fit to each formulation arm and its safe-space boundaries put next to the PBPK truth. They <strong>nearly coincide</strong>: the fitted sparse-data PopPK model reaches the same BE conclusions as the mechanistic PBPK model.</p>
+<p><strong>Safe-space boundaries (power ≥ 80%), PBPK vs PopPK — licensed Pumas run:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Endpoint</th>
+<th>n</th>
+<th>PBPK [lo, hi] h</th>
+<th>PopPK [lo, hi] h</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cmax</td>
+<td>48</td>
+<td>[2.00, 4.15]</td>
+<td>[1.95, 4.05]</td>
+</tr>
+<tr class="even">
+<td>Cmax</td>
+<td>86</td>
+<td>[1.80, 4.25]</td>
+<td>[1.75, 4.15]</td>
+</tr>
+<tr class="odd">
+<td>AUC₀–t</td>
+<td>48</td>
+<td>[1.00, 4.60]</td>
+<td>[1.00, 4.55]</td>
+</tr>
+<tr class="even">
+<td>AUC₀–t</td>
+<td>86</td>
+<td>[1.00, 4.70]</td>
+<td>[1.00, 4.65]</td>
+</tr>
+<tr class="odd">
+<td>AUC_inf</td>
+<td>48</td>
+<td>[1.00, 4.95]</td>
+<td>[1.00, 4.95]</td>
+</tr>
+<tr class="even">
+<td><strong>Joint (Cmax &amp; AUC₀–t)</strong></td>
+<td>48</td>
+<td><strong>[1.95, 4.10]</strong></td>
+<td><strong>[1.90, 4.05]</strong></td>
+</tr>
+<tr class="odd">
+<td><strong>Joint (Cmax &amp; AUC₀–t)</strong></td>
+<td>86</td>
+<td><strong>[1.85, 4.25]</strong></td>
+<td><strong>[1.75, 4.15]</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Reading it:</strong> Cmax is the binding endpoint (AUC stays equivalent over a much wider T50 range). The joint safe space is <strong>T50 ≈ 1.9–4.1 h</strong>, and the PBPK and PopPK methods agree to within ~0.05–0.1 h — i.e.&nbsp;<strong>decision equivalence holds</strong>.</p>
+<section id="in-vivo-release-scale-ivivc-a-secondary-optional-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="in-vivo-release-scale-ivivc-a-secondary-optional-analysis">4.1 In-vivo release scale (IVIVC) — a secondary, optional analysis</h3>
+<p>Ideally the fitted release scale α would recover each tablet’s T50 (an in-silico IVIVC). In the fit that produced the safe space above (each arm fit with its own disposition), <strong>α comes out nearly flat</strong> (≈1.4–1.7 h across T50 = 1–7 h) — <em>not</em> an IVIVC. This is the expected <strong>one-compartment flip-flop ambiguity</strong>: from a single arm the model cannot separate the release rate from the elimination rate, so the formulation effect leaks into the (freely fitted) clearance and volume instead of into α.</p>
+<p>To recover the IVIVC we constrain disposition to be formulation-independent (clearance and volume are properties of the drug+subject, not the tablet — §2.3) and let only α vary. Then α climbs monotonically with T50:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>PBPK T50 (h)</th>
+<th>1.0</th>
+<th>2.0</th>
+<th>3.0</th>
+<th>3.5</th>
+<th>4.0</th>
+<th>5.0</th>
+<th>6.0</th>
+<th>7.0</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>α, per-arm fit (flat)</td>
+<td>1.4</td>
+<td>1.6</td>
+<td>1.7</td>
+<td>1.6</td>
+<td>1.7</td>
+<td>1.7</td>
+<td>1.7</td>
+<td>1.7</td>
+</tr>
+<tr class="even">
+<td>α, disposition-constrained (IVIVC)</td>
+<td>3.2</td>
+<td>4.1</td>
+<td>5.4</td>
+<td>5.7</td>
+<td>6.5</td>
+<td>7.6</td>
+<td>9.1</td>
+<td>11.0</td>
+</tr>
+</tbody>
+</table>
+<p>Constraining disposition also smooths the endpoints and so shifts the safe space (they are coupled — §2.3). This IVIVC analysis is therefore reported <strong>separately</strong> from the primary per-arm safe space; the constrained-fit α column above is from the license-free cross-check and would be finalized by a joint population fit.</p>
+</section>
+<section id="release-shape-γ-fixed-vs-estimated-within-the-ivivcconstrained-fit" class="level3">
+<h3 class="anchored" data-anchor-id="release-shape-γ-fixed-vs-estimated-within-the-ivivcconstrained-fit">4.2 Release shape γ — fixed vs estimated (within the IVIVC/constrained fit)</h3>
+<p>Within that constrained fit, the release shape γ can be <strong>estimated as one shared value</strong> or <strong>fixed at 1.0</strong> (the PBPK dissolution β). Both are reported:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Endpoint</th>
+<th>n</th>
+<th>PBPK</th>
+<th>PopPK, <strong>γ estimated</strong> (≈0.8)</th>
+<th>PopPK, <strong>γ = 1.0</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cmax</td>
+<td>48</td>
+<td>2.00–4.15</td>
+<td><strong>1.70–4.60</strong></td>
+<td>1.00–6.40</td>
+</tr>
+<tr class="even">
+<td>Joint (Cmax &amp; AUC₀–t)</td>
+<td>48</td>
+<td>1.95–4.10</td>
+<td><strong>1.65–4.55</strong></td>
+<td>1.00–6.35</td>
+</tr>
+</tbody>
+</table>
+<p><strong>γ estimated matches the PBPK safe space; γ = 1.0 inflates it badly</strong> — because β = 1.0 is the <em>in-vitro dissolution</em> shape, whereas the PopPK γ is the <em>in-vivo input</em> shape (dissolution folded with gut absorption and transit) and is not 1. So γ is estimated, not fixed. (Full table: <code>GAMMA_COMPARISON_SUMMARY.md</code>.)</p>
+<hr>
+</section>
+</section>
+<section id="references-and-links" class="level2">
+<h2 class="anchored" data-anchor-id="references-and-links">5. References and links</h2>
+<p><strong>Models &amp; software</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>What</th>
+<th>Link</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>OSP metformin PBPK model (the base model)</td>
+<td>https://github.com/Open-Systems-Pharmacology/Metformin-Model</td>
+</tr>
+<tr class="even">
+<td>Hanke et al.&nbsp;2020 — metformin PBPK model paper</td>
+<td>https://doi.org/10.1007/s40262-020-00896-w</td>
+</tr>
+<tr class="odd">
+<td>PK-Sim / OSP Suite</td>
+<td>https://www.open-systems-pharmacology.org/ · docs https://docs.open-systems-pharmacology.org/</td>
+</tr>
+<tr class="even">
+<td>Pumas (PopPK fitting)</td>
+<td>https://pumas.ai · docs https://docs.pumas.ai/</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Methodology papers</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>What</th>
+<th>Link</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Morris et al.&nbsp;AAPS J 2026 — Part 1 (model development)</td>
+<td>https://doi.org/10.1208/s12248-026-01213-2</td>
+</tr>
+<tr class="even">
+<td>Morris et al.&nbsp;AAPS J 2026 — Part 2 (type-I error + safe space)</td>
+<td>https://doi.org/10.1208/s12248-026-01215-0</td>
+</tr>
+<tr class="odd">
+<td>Bois &amp; Brochot 2024 — Bayesian VBE</td>
+<td>https://doi.org/10.3389/fphar.2024.1404619</td>
+</tr>
+<tr class="even">
+<td>Chen et al.&nbsp;2024 — model-integrated BE</td>
+<td>https://doi.org/10.1002/psp4.13225</td>
+</tr>
+<tr class="odd">
+<td>Gajjar et al.&nbsp;2022 — popPK VBE for LAIs</td>
+<td>https://doi.org/10.1016/j.ejps.2022.106296</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Clinical / formulation data for metformin XR</strong></p>
+<ul>
+<li>Timmins et al., <em>Clin Pharmacokinet</em> 2005 — Glucophage XR PK.</li>
+<li>Stepensky et al., <em>Biopharm Drug Dispos</em> 2002 — dissolution + PK.</li>
+<li>FDA NDA 212595 clinical-pharmacology review — within-subject CVs used in the VBE.</li>
+</ul>
+<p><strong>Regulatory</strong></p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>What</th>
+<th>Link</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>FDA PBPK biopharmaceutics guidance (2020)</td>
+<td>https://www.fda.gov/media/142500/download</td>
+</tr>
+<tr class="even">
+<td>FDA Statistical Approaches to BE (2001)</td>
+<td>https://www.fda.gov/media/70958/download</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><em>Companion documents:</em> the full technical walkthrough of the PopPK pipeline is in <code>POPPK_ANALYSIS_WALKTHROUGH.md</code>; the master project plan (all 9 phases, PK-Sim build through write-up) is in project notes (not included). Authored 2026-07-22.*</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

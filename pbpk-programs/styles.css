@@ -1,0 +1,46 @@
+/* Publication-style ("booktabs") tables: horizontal rules only, no zebra
+   striping, no vertical lines. Used by both Quarto reports. */
+table {
+  border-collapse: collapse;
+  margin: 1.1em auto;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+thead th {
+  border-top: 2px solid #111 !important;
+  border-bottom: 1px solid #111 !important;
+  border-left: none !important;
+  border-right: none !important;
+  padding: 7px 14px;
+  text-align: left;
+  font-weight: 600;
+  background: #fff !important;
+}
+tbody td {
+  border: none !important;
+  padding: 6px 14px;
+}
+tbody tr,
+tbody tr:nth-child(odd),
+tbody tr:nth-child(even) {
+  background: #fff !important;   /* kill any zebra striping from the theme */
+}
+tbody tr:last-child td {
+  border-bottom: 2px solid #111 !important;
+}
+/* Neutralise Bootstrap/Quarto striped + bordered table variants. */
+.table-striped > tbody > tr:nth-of-type(odd) > *,
+.table-striped > tbody > tr:nth-of-type(even) > * {
+  background-color: transparent !important;
+}
+.table > :not(caption) > * > * { box-shadow: none !important; }
+caption,
+.quarto-table-caption,
+figcaption {
+  caption-side: top;
+  text-align: left;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: #333;
+  padding-bottom: 0.4em;
+}

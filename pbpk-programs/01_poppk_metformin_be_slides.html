@@ -1,0 +1,219 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Metformin XR — PopPK Virtual BE</title><style>
+:root{
+  --bg:#0f1420; --panel:#161d2e; --ink:#e8edf6; --muted:#93a1bd;
+  --line:#26304a; --accent:#5b9dff; --accent2:#38d9a9; --warn:#ffb454; --bad:#ff6b6b;
+  --pbpk:#5b9dff; --poppk:#38d9a9;
+}
+@media (prefers-color-scheme: light){
+  :root{--bg:#f6f8fc;--panel:#ffffff;--ink:#101828;--muted:#5b6b86;--line:#dbe2ee;
+        --accent:#2563eb;--accent2:#0d9488;--warn:#b45309;--bad:#dc2626;
+        --pbpk:#2563eb;--poppk:#0d9488;}
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;}
+#deck{height:100vh;width:100vw;overflow:hidden;position:relative}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;
+  padding:4.5vh 6vw 7vh;animation:fade .35s ease}
+.slide.active{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1{font-size:clamp(28px,4.4vw,52px);line-height:1.08;margin:.1em 0 .25em;letter-spacing:-.02em}
+h2{font-size:clamp(22px,3.1vw,38px);margin:0 0 .5em;letter-spacing:-.01em;
+  border-left:5px solid var(--accent);padding-left:.5em}
+h3{font-size:clamp(15px,1.5vw,20px);color:var(--muted);font-weight:600;margin:.2em 0}
+p,li{font-size:clamp(14px,1.55vw,20px);line-height:1.5;color:var(--ink)}
+.muted{color:var(--muted)}
+.kicker{text-transform:uppercase;letter-spacing:.18em;font-size:13px;color:var(--accent);font-weight:700}
+ul{margin:.3em 0;padding-left:1.2em}
+li{margin:.35em 0}
+.center{justify-content:center}
+.grid{display:grid;gap:1.4vw}
+.two{grid-template-columns:1fr 1fr}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1.1em 1.3em}
+.big{font-size:clamp(30px,5vw,64px);font-weight:800;letter-spacing:-.02em}
+.accent{color:var(--accent)} .accent2{color:var(--accent2)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+table{border-collapse:collapse;width:100%;font-size:clamp(11px,1.25vw,16px);
+  font-variant-numeric:tabular-nums}
+th,td{padding:.34em .5em;text-align:right;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+thead th{color:var(--muted);font-weight:700;border-bottom:2px solid var(--line);
+  position:sticky;top:0;background:var(--panel)}
+tbody tr:hover{background:rgba(91,157,255,.07)}
+.tblwrap{overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.badge{font-size:.8em;font-weight:700;padding:.12em .5em;border-radius:999px;white-space:nowrap}
+.badge.ok{background:rgba(56,217,169,.16);color:var(--accent2)}
+.badge.no{background:rgba(255,107,107,.16);color:var(--bad)}
+.fig{flex:1;display:flex;align-items:center;justify-content:center;min-height:0}
+.fig img{max-width:100%;max-height:72vh;border-radius:12px;border:1px solid var(--line);
+  background:#fff;padding:6px}
+.legend{display:flex;gap:1.4em;font-size:14px;color:var(--muted);margin:.4em 0}
+.dot{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:.4em;vertical-align:baseline}
+.footer{position:absolute;bottom:2.4vh;left:6vw;right:6vw;display:flex;justify-content:space-between;
+  align-items:center;font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:.7em}
+.nav{position:absolute;bottom:2vh;right:6vw;display:flex;gap:.4em}
+.nav button{background:var(--panel);color:var(--ink);border:1px solid var(--line);
+  border-radius:8px;padding:.35em .7em;cursor:pointer;font-size:14px}
+.nav button:hover{border-color:var(--accent)}
+.progress{position:absolute;top:0;left:0;height:4px;background:var(--accent);transition:width .3s}
+.pill{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:999px;
+  padding:.2em .8em;font-size:13px;color:var(--muted);margin:.15em .3em .15em 0}
+.note{font-size:clamp(12px,1.2vw,15px);color:var(--muted);margin-top:.4em}
+.callout{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--warn);
+  border-radius:10px;padding:.7em 1em;margin-top:.7em;font-size:clamp(12px,1.25vw,16px)}
+.callout b{color:var(--warn)}
+.callout.split{display:grid;grid-template-columns:1fr 1fr;gap:1em;border-left-color:var(--accent)}
+.callout .up{color:var(--bad);font-weight:700}.callout .dn{color:var(--accent2);font-weight:700}
+code{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:.08em .35em;font-size:.9em}
+</style></head>
+<body><div class="progress" id="prog"></div><div id="deck">
+<section class="slide center">
+ <div class="kicker">Model-Based Bioequivalence · Learning project</div>
+ <h1>PopPK-based Virtual Bioequivalence<br>of Metformin XR</h1>
+ <h3>Deriving BE endpoints and the formulation safe space from a population-PK
+ surrogate fit to PBPK-simulated subjects</h3>
+ <div style="margin-top:1.2em">
+   <span class="pill">Pumas · Julia</span>
+   <span class="pill">1-cmt oral, first-order absorption + lag</span>
+   <span class="pill">CQA swept: release half-time T50 = 1–7 h</span>
+   <span class="pill">Reference formulation: T50 = 3.0 h</span>
+ </div>
+ <p class="note">Pipeline executed 2026-06-10 on a licensed Pumas / JuliaHub environment.
+ Source: <code>pbpk-programs/poppk_pumas</code></p>
+ <div class="footer"><span>Metformin XR · Model-Based Bioequivalence · PopPK surrogate</span><span class="pageno"></span></div></section><section class="slide ">
+ <h2>Objective & rationale</h2>
+ <div class="grid two">
+   <div class="card">
+     <h3>The question</h3>
+     <p>Can a <b>lightweight PopPK model</b> — the kind you can fit to a sparse
+     clinical BE study — reproduce the bioequivalence conclusions that the full
+     mechanistic <b>PBPK</b> model produces for a modified-release product?</p>
+   </div>
+   <div class="card">
+     <h3>Why it matters</h3>
+     <ul>
+       <li>PBPK sweeps are expensive and platform-bound (PK-Sim).</li>
+       <li>Regulatory BE decisions are made on <b>NCA of observed concentrations</b>.</li>
+       <li>If a PopPK surrogate agrees, it validates a cheaper, data-driven route
+       to the same <b>safe space</b>.</li>
+     </ul>
+   </div>
+ </div>
+ <div class="card" style="margin-top:1.4vw">
+   <h3>Critical quality attribute (CQA)</h3>
+   <p>Metformin XR is a modified-release tablet. The formulation attribute under
+   test is the in-vivo <b>release half-time T50</b>, swept from 1 h (fast) to 7 h
+   (slow). The <b>reference</b> product releases at T50 = 3.0 h. A test batch is
+   bioequivalent if the 90% CI of the GMR for Cmax / AUC lies within 0.80–1.25.</p>
+ </div>
+ <div class="footer"><span>Metformin XR · Model-Based Bioequivalence · PopPK surrogate</span><span class="pageno"></span></div></section><section class="slide ">
+ <h2>Analysis pipeline</h2>
+ <div class="grid two">
+  <div class="card">
+   <h3>From PBPK output to a fitted PopPK model</h3>
+   <ul>
+    <li><b>1 · Dense PBPK profiles.</b> 8 PK-Sim virtual populations (one per T50),
+        24 subjects each, 0–24 h.</li>
+    <li><b>2 · Sparse-sample</b> each subject to a realistic BE sampling schedule
+        and add <b>15% proportional</b> residual error → NONMEM-style dataset.</li>
+    <li><b>3 · Fit</b> a Pumas PopPK model per formulation arm (FOCE).</li>
+    <li><b>4 · Re-simulate</b> dense individual predictions (IPRED).</li>
+    <li><b>5 · NCA</b> on IPRED → per-subject Cmax, AUC<sub>tEnd</sub>, AUC<sub>inf</sub>.</li>
+    <li><b>6 · TOST / VBE</b> → GMR, 90% CI, power, safe space.</li>
+   </ul>
+  </div>
+  <div class="card">
+   <h3>PopPK structural model</h3>
+   <ul>
+    <li>One-compartment, first-order absorption with <b>lag time</b>.</li>
+    <li>Parameters: <code>Ka</code>, <code>CL</code>, <code>Vc</code>, <code>tlag</code>.</li>
+    <li>IIV (log-normal) on <b>Ka, CL, Vc</b>.</li>
+    <li>Proportional residual error.</li>
+   </ul>
+   <p class="note">The same BE machinery (<code>be_utils.jl</code> — TOST, VBE,
+   safe-space) is used here and on the PBPK side, so any difference in conclusion
+   is attributable to the model, not the statistics.</p>
+  </div>
+ </div>
+ <div class="footer"><span>Metformin XR · Model-Based Bioequivalence · PopPK surrogate</span><span class="pageno"></span></div></section><section class="slide ">
+ <h2>PopPK parameter estimates by formulation (T50)</h2>
+ <div class="tblwrap" style="max-height:66vh">
+ <table><thead><tr>
+   <th>T50 (h)</th><th>tv Ka (1/h)</th><th>tv CL (L/h)</th><th>tv Vc (L)</th>
+   <th>tv lag (h)</th><th>ω Ka</th><th>ω CL</th><th>ω Vc</th><th>σ prop</th>
+ </tr></thead><tbody><tr><td>1.0</td><td>0.948</td><td>10.40</td><td>82.7</td><td>0.336</td><td>0.152</td><td>0.063</td><td>0.101</td><td>0.186</td></tr><tr><td>2.0</td><td>0.772</td><td>10.70</td><td>92.2</td><td>0.327</td><td>0.239</td><td>0.064</td><td>0.127</td><td>0.199</td></tr><tr><td>3.0</td><td>0.707</td><td>11.34</td><td>106.9</td><td>0.340</td><td>0.240</td><td>0.070</td><td>0.122</td><td>0.206</td></tr><tr><td>3.5</td><td>0.733</td><td>11.82</td><td>116.0</td><td>0.343</td><td>0.240</td><td>0.066</td><td>0.123</td><td>0.208</td></tr><tr><td>4.0</td><td>0.708</td><td>12.34</td><td>125.1</td><td>0.345</td><td>0.290</td><td>0.074</td><td>0.134</td><td>0.212</td></tr><tr><td>5.0</td><td>0.696</td><td>13.37</td><td>143.5</td><td>0.337</td><td>0.280</td><td>0.069</td><td>0.132</td><td>0.222</td></tr><tr><td>6.0</td><td>0.683</td><td>13.99</td><td>167.2</td><td>0.323</td><td>0.292</td><td>0.066</td><td>0.162</td><td>0.240</td></tr><tr><td>7.0</td><td>0.681</td><td>15.33</td><td>192.5</td><td>0.334</td><td>0.180</td><td>0.079</td><td>0.112</td><td>0.253</td></tr></tbody></table></div>
+ <p class="note">As T50 increases (slower release), estimated <b>Ka falls</b> and
+ apparent <b>CL/Vc rise</b> — the classic flip-flop signature where the terminal
+ slope is governed by absorption rather than elimination. IIV terms are stable
+ (~0.15–0.29 on Ka, ~0.06–0.08 on CL). <code>OFV</code> not reported by this
+ Pumas build's <code>deviance()</code> (handled gracefully).</p>
+ <div class="footer"><span>Metformin XR · Model-Based Bioequivalence · PopPK surrogate</span><span class="pageno"></span></div></section><section class="slide ">
+ <h2>NCA diagnostics on re-simulated profiles</h2>
+ <div class="tblwrap" style="max-height:60vh">
+ <table><thead><tr>
+  <th>T50 (h)</th><th>n subj</th><th>mean Cmax</th><th>mean AUC<sub>tEnd</sub></th>
+  <th>mean AUC<sub>inf</sub></th><th>mean % extrap</th><th>mean λz R²<sub>adj</sub></th>
+ </tr></thead><tbody><tr><td>1.0</td><td>24</td><td>27.3</td><td>279</td><td>299</td><td>6.6</td><td>1.0000</td></tr><tr><td>2.0</td><td>24</td><td>23.6</td><td>265</td><td>290</td><td>8.6</td><td>1.0000</td></tr><tr><td>3.0</td><td>24</td><td>20.3</td><td>245</td><td>274</td><td>10.4</td><td>1.0000</td></tr><tr><td>3.5</td><td>24</td><td>19.1</td><td>233</td><td>263</td><td>11.2</td><td>1.0000</td></tr><tr><td>4.0</td><td>24</td><td>17.6</td><td>221</td><td>252</td><td>12.2</td><td>1.0000</td></tr><tr><td>5.0</td><td>24</td><td>15.6</td><td>201</td><td>232</td><td>13.5</td><td>1.0000</td></tr><tr><td>6.0</td><td>24</td><td>13.6</td><td>184</td><td>221</td><td>16.7</td><td>1.0000</td></tr><tr><td>7.0</td><td>24</td><td>12.1</td><td>166</td><td>203</td><td>17.5</td><td>1.0000</td></tr></tbody></table></div>
+ <div class="grid two" style="margin-top:1.2vw">
+   <div class="card"><h3>Fit quality</h3><p>Terminal-phase regressions are
+   excellent (R²<sub>adj</sub> ≈ 1.00 throughout).</p></div>
+   <div class="card"><h3>Watch-out</h3><p>% AUC extrapolated climbs with T50 —
+   at slow release the terminal phase is absorption-limited, so
+   <b>AUC<sub>inf</sub> is the least robust endpoint</b> at high T50.</p></div>
+ </div>
+ <div class="footer"><span>Metformin XR · Model-Based Bioequivalence · PopPK surrogate</span><span class="pageno"></span></div></section><section class="slide ">
+ <h2>PopPK bioequivalence — GMR (90% CI) vs reference</h2>
+ <div class="tblwrap" style="max-height:60vh">
+ <table><thead><tr><th>T50 (h)</th><th>Cmax</th><th>AUC<sub>tEnd</sub></th>
+   <th>AUC<sub>inf</sub></th></tr></thead><tbody><tr><td>1.0</td><td class="bad">1.338<br><span class='muted' style='font-size:.82em'>(1.299–1.378)</span></td><td>1.141<br><span class='muted' style='font-size:.82em'>(1.109–1.173)</span></td><td>1.092<br><span class='muted' style='font-size:.82em'>(1.064–1.121)</span></td></tr><tr><td>2.0</td><td>1.156<br><span class='muted' style='font-size:.82em'>(1.123–1.190)</span></td><td>1.083<br><span class='muted' style='font-size:.82em'>(1.056–1.110)</span></td><td>1.060<br><span class='muted' style='font-size:.82em'>(1.034–1.088)</span></td></tr><tr><td>3.0 <span class="pill" style="padding:.05em .5em">ref</span></td><td>1.000<br><span class='muted' style='font-size:.82em'>(1.000–1.000)</span></td><td>1.000<br><span class='muted' style='font-size:.82em'>(1.000–1.000)</span></td><td>1.000<br><span class='muted' style='font-size:.82em'>(1.000–1.000)</span></td></tr><tr><td>3.5</td><td>0.938<br><span class='muted' style='font-size:.82em'>(0.916–0.960)</span></td><td>0.951<br><span class='muted' style='font-size:.82em'>(0.929–0.974)</span></td><td>0.959<br><span class='muted' style='font-size:.82em'>(0.934–0.985)</span></td></tr><tr><td>4.0</td><td>0.864<br><span class='muted' style='font-size:.82em'>(0.841–0.887)</span></td><td>0.899<br><span class='muted' style='font-size:.82em'>(0.880–0.919)</span></td><td>0.918<br><span class='muted' style='font-size:.82em'>(0.894–0.942)</span></td></tr><tr><td>5.0</td><td class="bad">0.762<br><span class='muted' style='font-size:.82em'>(0.744–0.781)</span></td><td class="bad">0.817<br><span class='muted' style='font-size:.82em'>(0.799–0.837)</span></td><td>0.847<br><span class='muted' style='font-size:.82em'>(0.825–0.869)</span></td></tr><tr><td>6.0</td><td class="bad">0.663<br><span class='muted' style='font-size:.82em'>(0.643–0.683)</span></td><td class="bad">0.748<br><span class='muted' style='font-size:.82em'>(0.728–0.769)</span></td><td class="bad">0.807<br><span class='muted' style='font-size:.82em'>(0.781–0.834)</span></td></tr><tr><td>7.0</td><td class="bad">0.591<br><span class='muted' style='font-size:.82em'>(0.574–0.609)</span></td><td class="bad">0.676<br><span class='muted' style='font-size:.82em'>(0.654–0.699)</span></td><td class="bad">0.735<br><span class='muted' style='font-size:.82em'>(0.703–0.769)</span></td></tr></tbody></table></div>
+ <p class="note"><span class="bad">Red</span> = 90% CI falls outside 0.80–1.25
+ (not bioequivalent). By PopPK: fast release (T50 = 1 h) fails on Cmax (too high);
+ slow release (T50 ≥ 5 h) fails on Cmax (too low). <b>Cmax is the sensitive,
+ decision-driving endpoint</b>; AUC<sub>tEnd</sub> stays BE across a wider band.</p>
+ <div class="footer"><span>Metformin XR · Model-Based Bioequivalence · PopPK surrogate</span><span class="pageno"></span></div></section><section class="slide ">
+ <h2>PopPK safe space (power ≥ 0.80)</h2>
+ <div class="tblwrap">
+ <table><thead><tr><th>Endpoint</th><th>n = 48</th><th>n = 86</th></tr></thead>
+ <tbody><tr><td>Cmax</td><td>1.95 – 4.05 h</td><td>1.75 – 4.15 h</td></tr><tr><td>AUC_tEnd</td><td>1.00 – 4.55 h</td><td>1.00 – 4.65 h</td></tr><tr><td>AUC_inf</td><td>1.00 – 4.90 h</td><td>1.00 – 5.10 h</td></tr><tr><td>Joint (Cmax &amp; AUC_0-t)</td><td>1.90 – 4.05 h</td><td>1.80 – 4.15 h</td></tr></tbody></table></div>
+ <div class="grid two" style="margin-top:1.4vw">
+   <div class="card"><h3>Reading the safe space</h3>
+   <p>The range of T50 values for which a batch would pass BE with ≥80% power.
+   A wider range = more formulation latitude.</p></div>
+   <div class="card"><h3>What it says</h3>
+   <p>Cmax defines a <b>tight window (~1.8–4.1 h)</b>; AUC endpoints tolerate the
+   full slow-release arm. Larger n narrows the low end slightly (more power to
+   detect a fast-release failure).</p></div>
+ </div>
+ <div class="footer"><span>Metformin XR · Model-Based Bioequivalence · PopPK surrogate</span><span class="pageno"></span></div></section><section class="slide ">
+ <h2>Conclusions — PopPK analysis</h2>
+ <ul>
+  <li>A simple 1-compartment PopPK model, fit to sparsely-sampled virtual
+      subjects, cleanly recovers the metformin XR BE structure.</li>
+  <li><b>Cmax</b> is the binding endpoint. The PopPK safe space is roughly
+      <b>T50 ≈ 1.8–4.1 h</b> (Cmax-limited); AUC endpoints are permissive across
+      the slow-release arm.</li>
+  <li>Flip-flop kinetics are visible in the parameter trends and inflate
+      AUC<sub>inf</sub> extrapolation at high T50 — treat AUC<sub>inf</sub> with
+      caution as a BE endpoint for slow-release batches.</li>
+ </ul>
+ <div class="card" style="margin-top:1em"><h3>Limitations</h3>
+ <p class="muted">Virtual (PBPK-derived) data with a fixed 15% proportional error;
+ residual-error and BSV assumptions are stylised. <code>OFV</code>/<code>deviance</code>
+ unavailable in this Pumas build (does not affect NCA-based BE). See the companion
+ deck for head-to-head agreement with the PBPK reference.</p></div>
+ <div class="footer"><span>Metformin XR · Model-Based Bioequivalence · PopPK surrogate</span><span class="pageno"></span></div></section>
+</div><div class="nav"><button onclick="show(i-1)">‹ Prev</button><button onclick="show(i+1)">Next ›</button></div><script>
+const slides=[...document.querySelectorAll('.slide')];
+let i=0;
+const prog=document.getElementById('prog');
+function show(n){i=Math.max(0,Math.min(slides.length-1,n));
+ slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+ prog.style.width=((i+1)/slides.length*100)+'%';
+ document.querySelectorAll('.pageno').forEach(e=>e.textContent=(i+1)+' / '+slides.length);}
+document.addEventListener('keydown',e=>{
+ if(['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)){show(i+1);e.preventDefault();}
+ else if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){show(i-1);e.preventDefault();}
+ else if(e.key==='Home')show(0); else if(e.key==='End')show(slides.length-1);});
+show(0);
+</script></body></html>

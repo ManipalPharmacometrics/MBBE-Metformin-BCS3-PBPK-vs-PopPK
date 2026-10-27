@@ -1,0 +1,11 @@
+T50,parameter,constant,estimate,se,relative_se,ci_lower,ci_upper,fit
+,tvalpha,false,1.7856194361751205,NaN,NaN,NaN,NaN,joint
+,slope,false,0.3437333160373794,NaN,NaN,NaN,NaN,joint
+,tvgamma,false,1.3666689604307254,NaN,NaN,NaN,NaN,joint
+,tvcl,false,12.162707873465292,NaN,NaN,NaN,NaN,joint
+,tvvc,false,126.02997802237422,NaN,NaN,NaN,NaN,joint
+,tvlag,true,0.001,NaN,NaN,NaN,NaN,joint
+,"Ω₁,₁",false,1.9328573112137067e-7,NaN,NaN,NaN,NaN,joint
+,"Ω₂,₂",false,0.057490728201810906,NaN,NaN,NaN,NaN,joint
+,"Ω₃,₃",false,0.06968903224366205,NaN,NaN,NaN,NaN,joint
+,σ_p,false,0.286048751321142,NaN,NaN,NaN,NaN,joint

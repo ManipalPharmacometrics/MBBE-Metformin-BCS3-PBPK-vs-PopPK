@@ -1,0 +1,28 @@
+
+====================================================================================================
+  TYPE I ERROR SUMMARY — both licensed PopPK fits
+====================================================================================================
+
+--- PopPK fit: per-arm ---
+endpoint                 side  limitPB/Pop   n   bndPBPK   bndPop   CQAerr    GMRtrue    T1rep   T1true   ratio cmp
+AUC_inf                  high  1.25/0.8     48     5.357    6.427   +20.0%      1.406    4.88%    1.81%   0.37x << DIFFERENT LIMITS
+AUC_inf                  high  1.25/0.8     86     5.357    6.427   +20.0%      1.406    5.04%    0.46%   0.09x << DIFFERENT LIMITS
+AUC_tEnd                 high   0.8/0.8     48     5.184    5.603    +8.1%      0.769    4.96%    0.07%   0.02x 
+AUC_tEnd                 high   0.8/0.8     86     5.184    5.603    +8.1%      0.769    5.42%    0.00%   0.00x 
+Cmax                     high   0.8/0.8     48     4.623    4.499    -2.7%      0.813    5.09%   15.38%   3.02x 
+Cmax                     high   0.8/0.8     86     4.623    4.499    -2.7%      0.813    5.34%   21.40%   4.01x 
+Cmax                     low   1.25/1.25    48     1.457    1.638   +12.4%      1.218    4.80%   24.23%   5.05x 
+Cmax                     low   1.25/1.25    86     1.457    1.638   +12.4%      1.218    4.88%   36.85%   7.56x 
+Joint (Cmax & AUC_0-t)   high   0.8/0.8     48     4.623    4.499    -2.7%      0.813    4.84%   12.85%   2.65x 
+Joint (Cmax & AUC_0-t)   high   0.8/0.8     86     4.623    4.499    -2.7%      0.813    5.03%   20.59%   4.10x 
+Joint (Cmax & AUC_0-t)   low   1.25/1.25    48     1.457    1.638   +12.4%      1.218    4.81%   25.06%   5.21x 
+Joint (Cmax & AUC_0-t)   low   1.25/1.25    86     1.457    1.638   +12.4%      1.218    4.95%   36.94%   7.46x 
+
+--- PopPK fit: joint ---
+endpoint                 side  limitPB/Pop   n   bndPBPK   bndPop   CQAerr    GMRtrue    T1rep   T1true   ratio cmp
+Cmax                     high   0.8/0.8     48     4.623    5.780   +25.0%      0.699    4.93%    0.00%   0.00x 
+Cmax                     high   0.8/0.8     86     4.623    5.780   +25.0%      0.699    5.17%    0.00%   0.00x 
+Joint (Cmax & AUC_0-t)   high   0.8/0.8     48     4.623    5.780   +25.0%      0.699    4.69%    0.00%   0.00x 
+Joint (Cmax & AUC_0-t)   high   0.8/0.8     86     4.623    5.780   +25.0%      0.699    5.10%    0.00%   0.00x 
+
+Wrote type1_summary_both_fits.csv / .md -> <repo>/poppk-per-arm/poppk_pumas/output_sparse

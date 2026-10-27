@@ -1,0 +1,15 @@
+PopPK NCA geometric-mean endpoints by formulation:
+8×6 DataFrame
+ Row │ T50      n      gm_Cmax  gm_AUC_tEnd  gm_AUC_inf  mean_pct_extrap
+     │ Float64  Int64  Float64  Float64      Float64     Float64
+─────┼───────────────────────────────────────────────────────────────────
+   1 │     1.0     24  28.8982      276.73      298.761              7.3
+   2 │     2.0     24  24.5128      261.992     289.975              9.5
+   3 │     3.0     24  20.5637      233.119     261.901             10.9
+   4 │     3.5     24  18.5248      229.138     260.008             11.8
+   5 │     4.0     24  18.0675      216.763     246.359             11.9
+   6 │     5.0     24  15.1252      194.333     229.952             15.4
+   7 │     6.0     24  13.7699      181.933     214.765             15.2
+   8 │     7.0     24  12.3543      166.364     203.178             18.0
+
+Wrote poppk_pk_parameters_individual.csv (BE schema) + poppk_nca_diagnostics.csv -> <repo>/poppk-per-arm/poppk_pumas/output_sparse

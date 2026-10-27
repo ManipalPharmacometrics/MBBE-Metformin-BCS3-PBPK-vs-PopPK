@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="PBPK vs PopPK type I error at the simulated BE boundary, metformin XR virtual bioequivalence.">
+<style>
+  html{color-scheme:light dark}
+  body{margin:0}
+  img{max-width:100%}
+  [hidden]{display:none!important}
+</style>
+<title>Type I Error at the Simulated BE Boundary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --ground:#fbfcfb;
+  --surface:#f2f5f2;
+  --panel:#ffffff;
+  --ink:#151d19;
+  --ink-2:#3b4a43;
+  --muted:#5f6e66;
+  --faint:#8b9a92;
+  --rule:#d7dfd9;
+  --rule-soft:#e6ebe7;
+  --pbpk:#a8302a;
+  --poppk:#2f5c9e;
+  --n48:#c2534d;
+  --n86:#5e1713;
+  --band:#2f6b4f;
+  --band-fill:rgba(47,107,79,.09);
+  --warn:#9a5c0c;
+  --warn-fill:rgba(154,92,12,.10);
+  --grid:#e2e8e3;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0e1310;
+    --surface:#161d19;
+    --panel:#141b17;
+    --ink:#e7ece8;
+    --ink-2:#c2cdc6;
+    --muted:#95a49b;
+    --faint:#6d7d74;
+    --rule:#2a3630;
+    --rule-soft:#212b26;
+    --pbpk:#e0655c;
+    --poppk:#4f96e6;
+    --n48:#c4544c;
+    --n86:#f2a49d;
+    --band:#5fa583;
+    --band-fill:rgba(95,165,131,.12);
+    --warn:#d9a253;
+    --warn-fill:rgba(217,162,83,.13);
+    --grid:#232e28;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0e1310;
+  --surface:#161d19;
+  --panel:#141b17;
+  --ink:#e7ece8;
+  --ink-2:#c2cdc6;
+  --muted:#95a49b;
+  --faint:#6d7d74;
+  --rule:#2a3630;
+  --rule-soft:#212b26;
+  --pbpk:#e0655c;
+  --poppk:#4f96e6;
+  --n48:#c4544c;
+  --n86:#f2a49d;
+  --band:#5fa583;
+  --band-fill:rgba(95,165,131,.12);
+  --warn:#d9a253;
+  --warn-fill:rgba(217,162,83,.13);
+  --grid:#232e28;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:Spectral,Georgia,'Times New Roman',serif;
+  font-size:16.5px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px 96px}
+.measure{max-width:63ch}
+
+/* ---------- masthead ---------- */
+header.mast{
+  padding:56px 0 30px;
+  border-bottom:2px solid var(--ink);
+  margin-bottom:0;
+}
+.kicker{
+  font-family:'IBM Plex Mono',ui-monospace,monospace;
+  font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--band);margin:0 0 18px;
+}
+h1{
+  font-family:Spectral,Georgia,serif;
+  font-weight:600;font-size:clamp(2.05rem,4.6vw,3.1rem);
+  line-height:1.06;letter-spacing:-.018em;margin:0 0 18px;
+  text-wrap:balance;max-width:26ch;
+}
+.standfirst{font-size:1.14rem;color:var(--ink-2);margin:0;max-width:60ch}
+.standfirst em{font-style:italic;color:var(--ink)}
+
+/* provenance strip */
+.prov{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));
+  gap:0;border-bottom:1px solid var(--rule);
+}
+.prov div{
+  padding:16px 20px 16px 0;border-right:1px solid var(--rule-soft);
+}
+.prov div:last-child{border-right:0}
+.prov dt{
+  font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:500;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--faint);margin:0 0 5px;
+}
+.prov dd{
+  font-family:'IBM Plex Mono',monospace;font-size:13px;margin:0;color:var(--ink);
+  font-variant-numeric:tabular-nums;line-height:1.4;
+}
+
+/* ---------- verdict ---------- */
+.verdict{
+  margin:40px 0 8px;padding:30px 34px;
+  background:var(--surface);border-left:3px solid var(--band);
+}
+.verdict h2{
+  font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--band);margin:0 0 16px;
+}
+.verdict p{margin:0 0 14px;font-size:1.06rem;max-width:66ch}
+.verdict p:last-child{margin-bottom:0}
+.verdict b{font-weight:600}
+
+/* ---------- numbered steps (a real sequence: Morris method) ---------- */
+section.step{
+  padding-top:52px;margin-top:8px;
+}
+.step-head{
+  display:flex;gap:20px;align-items:baseline;
+  border-top:1px solid var(--rule);padding-top:20px;margin-bottom:6px;
+}
+.step-n{
+  font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;
+  color:var(--band);letter-spacing:.06em;flex:0 0 auto;padding-top:8px;
+}
+.step-head h3{
+  font-family:Spectral,Georgia,serif;font-weight:600;
+  font-size:clamp(1.34rem,2.5vw,1.72rem);line-height:1.18;
+  letter-spacing:-.012em;margin:0;text-wrap:balance;
+}
+section.step > p, section.step > ul{max-width:63ch}
+section.step p{margin:0 0 15px}
+section.step ul{margin:0 0 15px;padding-left:1.1em}
+section.step li{margin-bottom:9px}
+
+h4.sub{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  margin:34px 0 12px;
+}
+
+/* ---------- tables ---------- */
+.tscroll{overflow-x:auto;margin:6px 0 10px;padding-bottom:2px}
+table{
+  border-collapse:collapse;width:100%;min-width:640px;
+  font-family:'IBM Plex Mono',monospace;font-size:12.6px;
+  font-variant-numeric:tabular-nums;
+}
+caption{
+  caption-side:bottom;text-align:left;font-family:Spectral,serif;
+  font-size:.87rem;color:var(--muted);padding-top:12px;line-height:1.5;
+  max-width:74ch;
+}
+th{
+  text-align:right;font-weight:500;font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);
+  padding:0 12px 9px;border-bottom:1px solid var(--ink);white-space:nowrap;
+}
+th:first-child,td:first-child{text-align:left;padding-left:0}
+th.l,td.l{text-align:left}
+td{
+  text-align:right;padding:9px 12px;border-bottom:1px solid var(--rule-soft);
+  color:var(--ink-2);white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:1px solid var(--rule)}
+td.k{color:var(--ink);font-weight:500}
+.sw-pbpk,.sw-poppk{color:var(--pbpk);font-weight:500}
+.sw-poppk{color:var(--poppk)}
+td.hi{color:var(--warn);font-weight:600}
+td.na{color:var(--faint);font-style:italic;font-family:Spectral,serif;font-size:12.5px}
+tr.flag td{background:var(--warn-fill)}
+.badge{
+  font-size:9px;letter-spacing:.09em;text-transform:uppercase;font-weight:600;
+  padding:2px 6px;border:1px solid currentColor;color:var(--warn);
+  white-space:nowrap;
+}
+
+/* ---------- figures ---------- */
+figure{margin:26px 0 12px}
+.figtitle{
+  font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0 0 4px;
+}
+figcaption{
+  font-size:.89rem;color:var(--muted);margin-top:14px;max-width:74ch;line-height:1.55;
+}
+figcaption b{color:var(--ink-2);font-weight:600}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+@media (max-width:720px){.panels{grid-template-columns:1fr}}
+.panel-lab{
+  font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500;
+  letter-spacing:.09em;color:var(--ink-2);margin:0 0 2px;
+}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.legend{
+  display:flex;flex-wrap:wrap;gap:20px;align-items:center;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-2);
+  margin:2px 0 14px;
+}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.lswatch{width:20px;height:0;border-top-width:2.5px;border-top-style:solid;display:inline-block}
+.ldot{width:9px;height:9px;border-radius:50%;display:inline-block}
+.lsq{width:9px;height:9px;display:inline-block;border:1.8px solid currentColor}
+
+/* svg text */
+.ax{font-family:'IBM Plex Mono',monospace;font-size:10px;fill:var(--faint)}
+.axt{font-family:'IBM Plex Mono',monospace;font-size:10.5px;fill:var(--muted)}
+.dlab{font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500}
+.nlab{font-family:'IBM Plex Mono',monospace;font-size:9.5px;fill:var(--band)}
+
+/* tooltip */
+.tip{
+  position:fixed;pointer-events:none;opacity:0;transition:opacity .09s;
+  background:var(--panel);border:1px solid var(--rule);
+  padding:9px 11px;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  line-height:1.55;color:var(--ink);z-index:50;
+  box-shadow:0 4px 14px rgba(0,0,0,.13);white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+.tip .tr{display:flex;gap:10px;justify-content:space-between}
+.tip .tk{color:var(--faint)}
+
+/* ---------- inline note ---------- */
+.note{
+  border:1px solid var(--rule);border-left:3px solid var(--warn);
+  padding:18px 22px;margin:4px 0 24px;max-width:70ch;
+  background:var(--panel);
+}
+.note p{margin:0;font-size:1rem;color:var(--ink-2)}
+.note b{color:var(--ink);font-weight:600}
+.note .nh{
+  font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--warn);
+  display:block;margin-bottom:8px;
+}
+.pin{
+  display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  color:var(--band);border:1px solid var(--band);padding:2px 7px;
+}
+
+/* ---------- caveats ---------- */
+.caveat{
+  border-top:1px solid var(--rule);margin-top:14px;padding-top:22px;
+}
+.caveat h5{
+  font-family:Spectral,serif;font-size:1.02rem;font-weight:600;margin:0 0 8px;
+}
+.caveat p{margin:0;color:var(--ink-2);max-width:66ch;font-size:.99rem}
+
+footer{
+  margin-top:60px;border-top:2px solid var(--ink);padding-top:22px;
+  font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);
+  line-height:1.85;
+}
+footer b{color:var(--ink);font-weight:500}
+code{
+  font-family:'IBM Plex Mono',monospace;font-size:.88em;
+  background:var(--surface);padding:1.5px 5px;color:var(--ink-2);
+}
+:focus-visible{outline:2px solid var(--band);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <p class="kicker">Metformin XR · virtual bioequivalence · PBPK vs PopPK</p>
+  <h1>Type I error at the simulated BE boundary</h1>
+  <p class="standfirst">Both methods report a correctly calibrated 5% at their own boundary. They disagree only about <em>where the boundary is</em> — and because the acceptance curve is near-vertical there, that disagreement is what moves the type I error.</p>
+</header>
+
+<dl class="prov">
+  <div><dt>CQA</dt><dd>Weibull T50<br>1.0 – 7.0 h</dd></div>
+  <div><dt>Reference</dt><dd>T50 = 3.0 h</dd></div>
+  <div><dt>Design</dt><dd>24 paired<br>virtual subjects</dd></div>
+  <div><dt>Within-subj CV</dt><dd>Cmax 12.2%<br>AUC 11.2%</dd></div>
+  <div><dt>Replicates</dt><dd>20 000 trials<br>per estimate</dd></div>
+  <div><dt>Test</dt><dd>TOST, 90% CI<br>α = 0.05</dd></div>
+</dl>
+
+<div class="verdict">
+  <h2>What the comparison shows</h2>
+  <p><b>The like-for-like comparison is a null result.</b> At its own simulated BE boundary each method returns 4.8–5.4% across every endpoint and both study sizes — as it must, since TOST is calibrated at the limit regardless of variance. The scaled-reference control returns 5.15% (n=48) and 5.39% (n=86).</p>
+  <p><b>The divergence is entirely in boundary placement.</b> Plotted against true GMR the two operating characteristics lie on top of one another. But a <b>1.1% error in the declared T50 boundary moves the true type I error from 5% to 9.6%</b> — an 87% relative error from a one-percent CQA error. This is Morris Part 2's warning, reproduced.</p>
+  <p><b>One endpoint fails outright.</b> PBPK's AUC<sub>inf</sub> boundary hits the <i>upper</i> limit (1.25) while PopPK's hits the <i>lower</i> (0.80), so the two are not comparable at all — independent support for treating AUC<sub>inf</sub> cautiously.</p>
+</div>
+
+<!-- ============ STEP 1 ============ -->
+<section class="step">
+  <div class="step-head">
+    <div class="step-n">STEP 1</div>
+    <h3>Invert the CQA → GMR relationship</h3>
+  </div>
+  <p>For each endpoint, walk outward from the reference along a 0.005 h T50 grid and find where the deterministic paired GMR first leaves [0.80, 1.25]. That T50 is the simulated BE boundary. Same per-subject log-interpolation the power curves use, so the boundaries and the safe space come off one construction.</p>
+
+  <div class="tscroll">
+  <table>
+    <caption>Simulated BE boundaries in T50 (h). “Not reached” means the GMR never leaves the acceptance corridor within the simulated CQA range — the boundary is not invertible there, not merely uncertain. Cmax is the only endpoint that binds on both sides, so it also sets the joint boundary.</caption>
+    <thead><tr>
+      <th class="l">Endpoint</th><th class="l">Side</th><th class="l">Limit</th>
+      <th>PBPK</th><th>PopPK per-arm</th><th>PopPK joint</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="k">Cmax</td><td class="l">lower</td><td class="l">1.25</td><td>1.457</td><td>1.359</td><td>1.250</td></tr>
+      <tr><td class="k">Cmax</td><td class="l">upper</td><td class="l">0.80</td><td>4.623</td><td>4.574</td><td>4.708</td></tr>
+      <tr><td class="k">AUC<sub>0–t</sub></td><td class="l">lower</td><td class="l">1.25</td><td class="na" colspan="3">not reached — GMR peaks at 1.154</td></tr>
+      <tr><td class="k">AUC<sub>0–t</sub></td><td class="l">upper</td><td class="l">0.80</td><td>5.184</td><td>5.221</td><td>5.526</td></tr>
+      <tr class="flag"><td class="k">AUC<sub>inf</sub></td><td class="l">upper</td><td class="l">—</td><td>5.357 <span class="badge">hits 1.25</span></td><td>6.158 <span class="badge">hits 0.80</span></td><td>6.546 <span class="badge">hits 0.80</span></td></tr>
+      <tr><td class="k">Joint</td><td class="l">both</td><td class="l">Cmax binds</td><td>1.457 / 4.623</td><td>1.359 / 4.574</td><td>1.250 / 4.708</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============ STEP 2 ============ -->
+<section class="step">
+  <div class="step-head">
+    <div class="step-n">STEP 2</div>
+    <h3>Type I error at each method's own boundary</h3>
+  </div>
+  <p>At the boundary the true GMR sits exactly on 0.80 or 1.25, so the Monte-Carlo acceptance rate there <em>is</em> the type I error. Replicates were raised to 20 000 — at your power-curve setting of 500 the standard error is ±1.0 percentage point, which cannot resolve a 5% tail.</p>
+
+  <div class="tscroll">
+  <table>
+    <caption>Acceptance rate at the method's own boundary, in percent. Everything lands on nominal except PBPK's AUC<sub>inf</sub>, where flip-flop kinetics make the GMR non-monotonic and the inversion unstable. The joint endpoint reads low at n=48 because a trial must clear both Cmax and AUC<sub>0–t</sub>.</caption>
+    <thead><tr>
+      <th class="l">Endpoint</th><th class="l">Side</th>
+      <th class="sw-pbpk">PBPK n=48</th><th class="sw-pbpk">PBPK n=86</th>
+      <th class="sw-poppk">PopPK n=48</th><th class="sw-poppk">PopPK n=86</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="k">Cmax</td><td class="l">lower</td><td>4.82</td><td>5.12</td><td>4.95</td><td>5.07</td></tr>
+      <tr><td class="k">Cmax</td><td class="l">upper</td><td>5.04</td><td>5.38</td><td>4.92</td><td>5.20</td></tr>
+      <tr><td class="k">AUC<sub>0–t</sub></td><td class="l">upper</td><td>4.98</td><td>5.23</td><td>4.97</td><td>5.19</td></tr>
+      <tr class="flag"><td class="k">AUC<sub>inf</sub></td><td class="l">upper</td><td class="hi">7.65</td><td class="hi">6.69</td><td>4.97</td><td>5.00</td></tr>
+      <tr><td class="k">Joint</td><td class="l">lower</td><td>5.04</td><td>5.22</td><td>5.18</td><td>5.24</td></tr>
+      <tr><td class="k">Joint</td><td class="l">upper</td><td>3.50</td><td>4.85</td><td>3.80</td><td>4.88</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4 class="sub">The operating characteristics are indistinguishable in GMR space</h4>
+  <p>This is the structural finding. As a function of <em>true GMR</em>, PBPK and PopPK produce the same acceptance curve — both cross 5% exactly at 0.80 and 1.25. The two methods do not differ in their test or in their variance; they differ only in the CQA → GMR mapping that decides which T50 sits at the limit.</p>
+
+  <figure>
+    <p class="figtitle">Fig. 1 — Acceptance rate vs true GMR · Cmax</p>
+    <div class="legend">
+      <span><i class="lswatch" style="border-color:var(--pbpk)"></i> PBPK</span>
+      <span><i class="lswatch" style="border-color:var(--poppk)"></i> PopPK (per-arm fit)</span>
+      <span><i class="lswatch" style="border-color:var(--band);border-top-style:dashed"></i> α = 0.05</span>
+      <span style="color:var(--band)">▏ shaded = BE corridor 0.80–1.25</span>
+    </div>
+    <div class="panels">
+      <div><p class="panel-lab">n = 48</p><div id="oc48"></div></div>
+      <div><p class="panel-lab">n = 86</p><div id="oc86"></div></div>
+    </div>
+    <figcaption><b>The curves overlap.</b> Both methods reach 5% acceptance precisely at the BE limits, and the plateau, shoulders and tails coincide. Note how much steeper the shoulders are at n = 86 — a bigger study has a tighter CI, so its acceptance rate falls away from the limit faster. 4 000 replicates per point.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ HOW TO READ ============ -->
+<section class="step">
+  <div class="step-head">
+    <div class="step-n">HOW TO READ</div>
+    <h3>What is actually happening at the boundary</h3>
+  </div>
+
+  <div class="note">
+    <span class="nh">Two different columns</span>
+    <p>In the Step 3 table the <b>8.1 and 9.6 are percentages</b> &mdash; a true type I error. The <b>1.66&times; and 1.85&times; are the ratios</b>, i.e. 8.1 &divide; 4.9. They are easy to conflate; they answer different questions.</p>
+  </div>
+
+  <h4 class="sub">The boundary is a knife-edge tablet</h4>
+  <p>Slower release means a lower Cmax, so as T50 rises the GMR falls. Somewhere there is a T50 where the true GMR is <em>exactly</em> 0.80 &mdash; sitting dead on the BE limit. That T50 is the boundary; PBPK puts it at 4.623 h. A tablet made to that release rate is neither quite failing nor quite passing.</p>
+
+  <h4 class="sub">The 5% appears there on its own &mdash; it is not a result</h4>
+  <p>Type I error is the chance a study concludes &ldquo;bioequivalent&rdquo; when the truth sits exactly on the limit. For TOST that is 5% <em>by construction</em>: at a true GMR of 0.80 you pass only if the lower confidence bound climbs above 0.80, which needs the estimate to land about 1.68 standard errors above the truth. A 1-in-20 fluke &mdash; no matter how variable the drug, no matter how large the study.</p>
+  <p>So when both methods return 4.8&ndash;5.4% at their own boundary, <b>that agreement is arithmetic, not validation</b>. Both would return 5% even if one of the models were badly wrong. It is the reason the like-for-like comparison had to be a null result.</p>
+
+  <h4 class="sub">So what are the 8.1% and 9.6%?</h4>
+  <p>PopPK draws its line at T50 = 4.574 h and reports &ldquo;type I error here is 4.9%&rdquo;. But the PBPK truth says that at 4.574 h the real GMR is <b>0.8049</b>, not 0.8000 &mdash; a hair <em>inside</em> the acceptance range, so a tablet there is truthfully just barely bioequivalent.</p>
+  <p>The real chance a study at that T50 passes is therefore not 5% but <b>8.1%</b> at n = 48 and <b>9.6%</b> at n = 86. That is what those numbers are: <b>the actual pass rate of a tablet sitting exactly where PopPK drew its line.</b> PopPK reported 4.9%.</p>
+  <p>Note what the risk is and is not. The product there is genuinely bioequivalent, so nothing unsafe is waved through. What is wrong is the <em>reported operating characteristic</em>: you would hand a regulator &ldquo;5%&rdquo; for a limit that really carries 8&ndash;10%.</p>
+
+  <h4 class="sub">Why a bigger study makes it worse</h4>
+  <p>Picture the acceptance curve as a cliff face. It is <b>pinned at 5% exactly at the limit for every study size</b> &mdash; more subjects cannot help you there, you still need the 1-in-20 fluke. What more subjects do is make the cliff <b>steeper</b>, because the confidence interval narrows.</p>
+  <p>The anchor does not move, but the wall beside it gets steeper. Take one small step inland from the edge &mdash; the 0.005 GMR offset &mdash; and a steeper cliff carries you higher up. With more subjects, &ldquo;genuinely just inside the limit&rdquo; becomes &ldquo;reliably demonstrable&rdquo;.</p>
+
+  <figure>
+    <p class="figtitle">Fig. 3 &mdash; The curves cross at the limit &middot; PBPK Cmax</p>
+    <div class="legend">
+      <span><i class="lswatch" style="border-color:var(--n48)"></i> n = 48</span>
+      <span><i class="lswatch" style="border-color:var(--n86)"></i> n = 86</span>
+      <span><i class="lswatch" style="border-color:var(--band);border-top-style:dashed"></i> 5%</span>
+      <span class="pin">crossing = GMR 0.80</span>
+    </div>
+    <div id="zoom"></div>
+    <figcaption><b>Left of 0.80 the small study accepts more often; right of it the large study does.</b> The two curves cross precisely where the true GMR equals the BE limit, and both pass through 5% there. That crossing is the whole answer: n does not move the 5% anchor, it only steepens the approach to it. 20 000 trials per point, averaged over 5 seeds, so the crossing is not Monte-Carlo noise.</figcaption>
+  </figure>
+
+  <div class="tscroll">
+  <table>
+    <caption>The same scan in numbers, all rows from <code>08_export_zoom_oc.jl</code> (20 000 trials &times; 5 seeds each). The BE limit falls between the 4.610 and 4.630 h rows, and the n = 48 / n = 86 ordering flips exactly across it. At the boundary itself &mdash; T50 = 4.623 h, true GMR 0.8000 &mdash; a separate 5-seed check gives 5.0% (n = 48) and 4.9% (n = 86): pinned, as the test guarantees.</caption>
+    <thead><tr>
+      <th class="l">T50 (h)</th><th>true GMR</th><th class="l">where</th>
+      <th>n = 48</th><th>n = 86</th><th class="l">effect of larger n</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="k">4.550</td><td>0.8074</td><td class="l">inside</td><td>10.0%</td><td>12.4%</td><td class="l">higher</td></tr>
+      <tr><td class="k">4.570</td><td>0.8054</td><td class="l">inside</td><td>8.3%</td><td>9.9%</td><td class="l">higher</td></tr>
+      <tr><td class="k">4.590</td><td>0.8033</td><td class="l">inside</td><td>6.9%</td><td>7.7%</td><td class="l">higher</td></tr>
+      <tr><td class="k">4.610</td><td>0.8013</td><td class="l">inside</td><td>5.7%</td><td>5.9%</td><td class="l">higher</td></tr>
+      <tr class="flag"><td class="k" colspan="6" style="text-align:left;white-space:normal">&darr;&nbsp; the BE limit sits here &mdash; T50 4.623 h, true GMR 0.8000, both n give ~5% &nbsp;&darr;</td></tr>
+      <tr><td class="k">4.630</td><td>0.7993</td><td class="l">outside</td><td>4.6%</td><td>4.5%</td><td class="l">lower</td></tr>
+      <tr><td class="k">4.650</td><td>0.7973</td><td class="l">outside</td><td>3.8%</td><td>3.4%</td><td class="l">lower</td></tr>
+      <tr><td class="k">4.710</td><td>0.7915</td><td class="l">outside</td><td>1.9%</td><td>1.3%</td><td class="l">lower</td></tr>
+      <tr><td class="k">4.750</td><td>0.7876</td><td class="l">outside</td><td>1.2%</td><td>0.7%</td><td class="l">lower</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4 class="sub">The takeaway</h4>
+  <p>A bigger, more expensive study offers <b>no protection</b> against a misplaced boundary &mdash; it makes the consequence worse. So the accuracy of the CQA&nbsp;&rarr;&nbsp;GMR inversion matters <em>more</em> as studies get larger, not less. That is the argument for letting the mechanistic model place the limit even in the case where the sparse-data model reproduces the BE decision correctly &mdash; which is exactly what the safe-space comparison found it does.</p>
+</section>
+
+<!-- ============ STEP 3 ============ -->
+<section class="step">
+  <div class="step-head">
+    <div class="step-n">STEP 3</div>
+    <h3>What a misplaced boundary costs</h3>
+  </div>
+  <p>The sponsor's-eye view. PopPK declares a boundary and reports the type I error it computes there — always ~5%. The question is what the PBPK truth's acceptance rate actually is at that same declared T50. Because the OC curve is near-vertical at the limit, a small CQA error lands well off 5%.</p>
+
+  <figure>
+    <p class="figtitle">Fig. 2 — Declared boundaries placed on the true acceptance curve</p>
+    <div class="legend">
+      <span><i class="ldot" style="background:var(--pbpk)"></i> PBPK boundary (nominal)</span>
+      <span><i class="ldot" style="background:var(--poppk)"></i> PopPK per-arm</span>
+      <span style="color:var(--poppk)"><i class="lsq"></i> PopPK joint</span>
+      <span>● n=48 &nbsp; ○ n=86</span>
+    </div>
+    <div class="panels">
+      <div><p class="panel-lab">upper limit · GMR 0.80</p><div id="dp_hi"></div></div>
+      <div><p class="panel-lab">lower limit · GMR 1.25</p><div id="dp_lo"></div></div>
+    </div>
+    <figcaption><b>Every point is a boundary some method declared; the y-value is the acceptance rate that boundary really carries.</b> PBPK sits on the 5% line by construction. PopPK's per-arm boundary lands 0.005 GMR units inside the upper limit and carries 8.1–9.6% instead. Its joint-fit boundary overshoots outward and carries 1.6–2.1%. On the lower side both fits overshoot into genuinely non-bioequivalent territory.</figcaption>
+  </figure>
+
+  <div class="tscroll">
+  <table>
+    <caption>“T1 reported” is what PopPK computes at its own boundary; “T1 true” is the PBPK truth's acceptance rate at that same declared T50. CQA error is the boundary error in percent of the PBPK value. AUC<sub>inf</sub> rows are omitted — the two methods hit different limits there, so the pairing is meaningless rather than merely noisy.</caption>
+    <thead><tr>
+      <th class="l">Fit</th><th class="l">Endpoint</th><th class="l">Side</th><th>n</th>
+      <th>bnd PBPK</th><th>bnd PopPK</th><th>CQA err</th>
+      <th>true GMR</th><th>T1 rep.</th><th>T1 true</th><th>ratio</th>
+    </tr></thead>
+    <tbody>
+      <tr><td class="k">per-arm</td><td class="l">Cmax</td><td class="l">upper</td><td>48</td><td>4.623</td><td>4.574</td><td>−1.1%</td><td>0.805</td><td>4.9%</td><td class="hi">8.1%</td><td class="hi">1.66×</td></tr>
+      <tr><td class="k">per-arm</td><td class="l">Cmax</td><td class="l">upper</td><td>86</td><td>4.623</td><td>4.574</td><td>−1.1%</td><td>0.805</td><td>5.2%</td><td class="hi">9.6%</td><td class="hi">1.85×</td></tr>
+      <tr><td class="k">per-arm</td><td class="l">Cmax</td><td class="l">lower</td><td>48</td><td>1.457</td><td>1.359</td><td>−6.8%</td><td>1.269</td><td>5.0%</td><td>1.4%</td><td>0.28×</td></tr>
+      <tr><td class="k">per-arm</td><td class="l">Cmax</td><td class="l">lower</td><td>86</td><td>1.457</td><td>1.359</td><td>−6.8%</td><td>1.269</td><td>5.1%</td><td>0.7%</td><td>0.14×</td></tr>
+      <tr><td class="k">per-arm</td><td class="l">AUC<sub>0–t</sub></td><td class="l">upper</td><td>48</td><td>5.184</td><td>5.221</td><td>+0.7%</td><td>0.797</td><td>5.0%</td><td>3.6%</td><td>0.72×</td></tr>
+      <tr><td class="k">per-arm</td><td class="l">Joint</td><td class="l">upper</td><td>86</td><td>4.623</td><td>4.574</td><td>−1.1%</td><td>0.805</td><td>4.9%</td><td class="hi">8.9%</td><td class="hi">1.81×</td></tr>
+      <tr><td class="k">joint</td><td class="l">Cmax</td><td class="l">upper</td><td>48</td><td>4.623</td><td>4.708</td><td>+1.8%</td><td>0.792</td><td>4.9%</td><td>2.1%</td><td>0.44×</td></tr>
+      <tr><td class="k">joint</td><td class="l">Cmax</td><td class="l">upper</td><td>86</td><td>4.623</td><td>4.708</td><td>+1.8%</td><td>0.792</td><td>5.2%</td><td>1.6%</td><td>0.30×</td></tr>
+      <tr><td class="k">joint</td><td class="l">Cmax</td><td class="l">lower</td><td>48</td><td>1.457</td><td>1.250</td><td>−14.2%</td><td>1.293</td><td>5.0%</td><td>0.2%</td><td>0.03×</td></tr>
+      <tr><td class="k">joint</td><td class="l">AUC<sub>0–t</sub></td><td class="l">upper</td><td>48</td><td>5.184</td><td>5.526</td><td>+6.6%</td><td>0.774</td><td>4.9%</td><td>0.2%</td><td>0.03×</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h4 class="sub">Three things worth carrying into the write-up</h4>
+  <ul>
+    <li><b>A larger study is more fragile, not less.</b> Going from n = 48 to n = 86 raises the cost of the same boundary error (8.1% → 9.6% on per-arm Cmax). Tighter confidence intervals steepen the OC curve, so sample size cannot buy robustness against a misplaced limit.</li>
+    <li><b>The direction of the error does not replicate.</b> On the upper side the per-arm fit places PopPK's boundary <em>inside</em> PBPK's (inflation, 1.66×) while the joint fit places it <em>outside</em> (deflation, 0.44×). Only the magnitude of the boundary error survives a change of fitting strategy — so report magnitude, and treat sign as fit-dependent.</li>
+    <li><b>The fast-release side is consistently permissive.</b> Both fits put PopPK's lower boundary below PBPK's — 1.359 h and 1.250 h against 1.457 h, i.e. 7% and 14% too low — where the true GMR is 1.27–1.29 and the product is genuinely not bioequivalent. The practical consequence is a failed study rather than an unsafe product: true acceptance there is only 0.2–1.4%.</li>
+  </ul>
+</section>
+
+<!-- ============ CAVEATS ============ -->
+<section class="step">
+  <div class="step-head">
+    <div class="step-n">LIMITS</div>
+    <h3>What this analysis cannot say</h3>
+  </div>
+
+  <div class="caveat">
+    <h5>The finding reduces to the boundary error</h5>
+    <p>Because the operating characteristics coincide in GMR space, “T1 true” is fully determined by the true GMR at the declared boundary. The amplification is real and worth reporting, but it is not evidence independent of the boundary discrepancy itself — it is that discrepancy expressed in units a regulator reads.</p>
+  </div>
+  <div class="caveat">
+    <h5>PBPK is the truth by construction</h5>
+    <p>The PopPK arm is fit to data simulated <em>from</em> the PBPK model, so this tests information loss from sparse sampling and structural mis-specification. It does not test whether the PBPK model itself is right.</p>
+  </div>
+  <div class="caveat">
+    <h5>The within-subject CVs are healthy-volunteer values</h5>
+    <p>Cmax 12.2% and AUC 11.2% come from the FDA NDA 212595 clinical-pharmacology review. Every acceptance rate on this page scales with those numbers; they are not estimated from this study.</p>
+  </div>
+  <div class="caveat">
+    <h5>The joint calibration control is not a nominal</h5>
+    <p>Scaling both Cmax and AUC to exactly 0.80 at once returns 0.26% (n=48) and 0.23% (n=86). That is an artifact of putting both endpoints on the limit simultaneously, which does not happen in the T50 sweep — Cmax binds first. Read the joint rows in Step 2 instead.</p>
+  </div>
+</section>
+
+<footer>
+  <b>Scripts</b> &nbsp; <code>scripts/05_type1_overlay.jl</code> — inversion, type I error, cross-evaluation · <code>scripts/06_type1_summary.jl</code> — reporting table · <code>scripts/07_export_type1_json.jl</code> — curve export · <code>scripts/08_export_zoom_oc.jl</code> — the crossing scan in Fig. 3<br>
+  <b>Outputs</b> &nbsp; <code>type1_overlay_boundaries.csv</code> · <code>type1_overlay.csv</code> · <code>type1_calibration_control.csv</code> · <code>type1_summary_both_fits.csv/.md</code> · <code>type1_zoom_oc.csv</code> · <code>fig_overlay_type1_oc_*.png</code> · <code>fig_overlay_type1_bars.png</code><br>
+  <b>Runs</b> &nbsp; per-arm fit → <code>poppk-per-arm/poppk_pumas/output/</code> · joint fit → <code>poppk-joint/poppk_pumas/output/</code><br>
+  <b>Method</b> &nbsp; Morris et al., AAPS J 2026 Part 2 — <span style="color:var(--faint)">doi 10.1208/s12248-026-01215-0</span> · companion to the safe-space overlay in <code>04_be_safespace_overlay.jl</code> · plain-language write-up saved at <code>docs/TYPE1_ERROR_EXPLAINED.md</code>
+</footer>
+
+</div>
+
+<div class="tip" id="tip"></div>
+
+<script>
+/* ---- real curve data, exported from 07_export_type1_json.jl ---- */
+const OC = {
+  PBPK: {
+    gmr:[1.3581,1.3333,1.3109,1.2905,1.2716,1.2543,1.2381,1.223,1.2089,1.1957,1.1832,1.1714,1.1563,1.1382,1.1211,1.1049,1.0896,1.075,1.061,1.0477,1.035,1.0228,1.0112,1.0,0.9869,0.9744,0.9624,0.9508,0.9396,0.9286,0.917,0.9058,0.895,0.8846,0.8746,0.8642,0.8537,0.8435,0.8337,0.8241,0.8148,0.8058,0.7971,0.7887,0.7804,0.7724,0.7647,0.7565,0.7485,0.7408,0.7333,0.7259,0.7188,0.7118,0.705,0.6984,0.6919,0.6856,0.6793,0.673,0.6668,0.6608,0.655,0.6492,0.6436,0.6381,0.6327,0.6275,0.6223,0.6173],
+    a48:[0,0,0.0005,0.0025,0.0132,0.042,0.1013,0.2068,0.3495,0.513,0.672,0.802,0.9152,0.9795,0.9942,0.9982,0.9998,1,1,1,1,1,1,1,1,1,1,1,0.9998,0.9998,0.9998,0.9988,0.996,0.9882,0.966,0.9212,0.8248,0.6798,0.4968,0.3222,0.1778,0.0875,0.0375,0.0142,0.006,0.0018,0.001,0.0002,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    a86:[0,0,0,0.0005,0.0062,0.033,0.1158,0.2842,0.5152,0.7278,0.8785,0.9502,0.9928,0.9995,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0.9992,0.9918,0.9655,0.8805,0.7143,0.479,0.2632,0.1125,0.0355,0.0088,0.0018,0.0002,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  },
+  PopPK: {
+    gmr:[1.332,1.3092,1.2884,1.2695,1.252,1.2359,1.2209,1.2069,1.1938,1.1815,1.1699,1.1589,1.145,1.1283,1.1125,1.0975,1.0832,1.0697,1.0568,1.0444,1.0326,1.0213,1.0104,1.0,0.9881,0.9767,0.9657,0.9551,0.9449,0.934,0.9204,0.9074,0.8948,0.8827,0.871,0.8598,0.8492,0.8389,0.829,0.8193,0.81,0.8009,0.7921,0.7836,0.7753,0.7673,0.7594,0.7488,0.7385,0.7285,0.7188,0.7094,0.7003,0.6914,0.6828,0.6744,0.6662,0.6583,0.651,0.6443,0.6378,0.6315,0.6253,0.6193,0.6134,0.6076,0.6019,0.5964,0.591,0.5857],
+    a48:[0.0002,0.001,0.005,0.017,0.049,0.1138,0.2145,0.346,0.4882,0.632,0.7558,0.848,0.93,0.982,0.9965,0.9988,0.9998,1,1,1,1,1,1,1,1,1,1,0.9998,0.9998,0.9998,0.9998,0.9978,0.9915,0.972,0.9222,0.831,0.7022,0.546,0.37,0.2238,0.1162,0.0532,0.0192,0.0088,0.0035,0.001,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    a86:[0,0,0.0005,0.0072,0.0402,0.1355,0.3015,0.5058,0.7002,0.8485,0.9312,0.9748,0.9938,0.9998,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0.9988,0.994,0.9675,0.903,0.7665,0.5618,0.3302,0.1562,0.0568,0.0145,0.0048,0.001,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  }
+};
+
+const NS = "http://www.w3.org/2000/svg";
+const el = (n, a) => { const e = document.createElementNS(NS, n); for (const k in a) e.setAttribute(k, a[k]); return e; };
+const tip = document.getElementById("tip");
+function showTip(html, x, y){
+  tip.innerHTML = html; tip.style.opacity = 1;
+  const r = tip.getBoundingClientRect();
+  let left = x + 14, top = y - r.height - 12;
+  if (left + r.width > window.innerWidth - 8) left = x - r.width - 14;
+  if (top < 8) top = y + 16;
+  tip.style.left = left + "px"; tip.style.top = top + "px";
+}
+const hideTip = () => { tip.style.opacity = 0; };
+const pct = v => (100*v).toFixed(1) + "%";
+
+/* ================= Fig 1 : operating characteristic ================= */
+function ocPanel(mount, key){
+  const W = 500, H = 330, M = {t:14, r:14, b:46, l:50};
+  const x0 = M.l, x1 = W - M.r, y0 = M.t, y1 = H - M.b;
+  const gLo = 0.575, gHi = 1.375;
+  const X = g => x0 + (g - gLo) / (gHi - gLo) * (x1 - x0);
+  const Y = a => y1 - a * (y1 - y0);
+  const svg = el("svg", {viewBox:`0 0 ${W} ${H}`, role:"img",
+    "aria-label":`Acceptance rate versus true GMR for ${key === "a48" ? 48 : 86} subjects; PBPK and PopPK curves coincide.`});
+
+  /* BE corridor */
+  svg.appendChild(el("rect", {x:X(0.80), y:y0, width:X(1.25)-X(0.80), height:y1-y0,
+    fill:"var(--band-fill)"}));
+  [0.80, 1.25].forEach(g => svg.appendChild(el("line",
+    {x1:X(g), x2:X(g), y1:y0, y2:y1, stroke:"var(--band)", "stroke-width":1, "stroke-dasharray":"3 3", opacity:".8"})));
+
+  /* grid + y axis */
+  [0, 0.25, 0.5, 0.75, 1].forEach(a => {
+    svg.appendChild(el("line", {x1:x0, x2:x1, y1:Y(a), y2:Y(a), stroke:"var(--grid)", "stroke-width":1}));
+    const t = el("text", {x:x0-9, y:Y(a)+3.5, "text-anchor":"end", class:"ax"});
+    t.textContent = a === 0 ? "0" : a === 1 ? "1.0" : a.toFixed(2); svg.appendChild(t);
+  });
+  /* alpha line */
+  svg.appendChild(el("line", {x1:x0, x2:x1, y1:Y(0.05), y2:Y(0.05),
+    stroke:"var(--band)", "stroke-width":1.5, "stroke-dasharray":"5 3"}));
+  const al = el("text", {x:x1, y:Y(0.05)-6, "text-anchor":"end", class:"nlab"});
+  al.textContent = "α = 0.05"; svg.appendChild(al);
+
+  /* x axis */
+  svg.appendChild(el("line", {x1:x0, x2:x1, y1:y1, y2:y1, stroke:"var(--rule)", "stroke-width":1.5}));
+  [0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3].forEach(g => {
+    svg.appendChild(el("line", {x1:X(g), x2:X(g), y1:y1, y2:y1+5, stroke:"var(--rule)", "stroke-width":1}));
+    const t = el("text", {x:X(g), y:y1+18, "text-anchor":"middle", class:"ax"});
+    t.textContent = g.toFixed(1); svg.appendChild(t);
+  });
+  const xt = el("text", {x:(x0+x1)/2, y:H-8, "text-anchor":"middle", class:"axt"});
+  xt.textContent = "true GMR (test / reference)"; svg.appendChild(xt);
+  const yt = el("text", {x:0, y:0, class:"axt", transform:`translate(13,${(y0+y1)/2}) rotate(-90)`, "text-anchor":"middle"});
+  yt.textContent = "P(conclude BE)"; svg.appendChild(yt);
+
+  /* series */
+  const order = ["PBPK", "PopPK"];
+  order.forEach(src => {
+    const d = OC[src];
+    const pts = d.gmr.map((g, i) => [g, d[key][i]]).sort((p, q) => p[0] - q[0]);
+    const path = pts.map((p, i) => `${i ? "L" : "M"}${X(p[0]).toFixed(2)},${Y(p[1]).toFixed(2)}`).join("");
+    svg.appendChild(el("path", {d:path, fill:"none",
+      stroke: src === "PBPK" ? "var(--pbpk)" : "var(--poppk)",
+      "stroke-width":2, "stroke-linejoin":"round",
+      opacity: src === "PBPK" ? 1 : 0.95}));
+  });
+  /* in-plot key, set in the empty left tail — the two curves coincide, so they
+     cannot be labelled apart on the line itself */
+  [["PBPK", "pbpk", 0.86], ["PopPK", "poppk", 0.76]].forEach(([txt, c, ay]) => {
+    svg.appendChild(el("line", {x1:x0+6, x2:x0+24, y1:Y(ay), y2:Y(ay),
+      stroke:`var(--${c})`, "stroke-width":2.5}));
+    const t = el("text", {x:x0+30, y:Y(ay)+3.5, class:"dlab", fill:`var(--${c})`});
+    t.textContent = txt; svg.appendChild(t);
+  });
+
+  /* crosshair + tooltip */
+  const hair = el("line", {x1:0, x2:0, y1:y0, y2:y1, stroke:"var(--muted)", "stroke-width":1, opacity:0});
+  svg.appendChild(hair);
+  const hit = el("rect", {x:x0, y:y0, width:x1-x0, height:y1-y0, fill:"transparent", style:"cursor:crosshair"});
+  svg.appendChild(hit);
+  hit.addEventListener("pointermove", ev => {
+    const b = svg.getBoundingClientRect();
+    const g = gLo + ((ev.clientX - b.left) / b.width * W - x0) / (x1 - x0) * (gHi - gLo);
+    hair.setAttribute("x1", X(g)); hair.setAttribute("x2", X(g)); hair.setAttribute("opacity", .5);
+    const near = src => {
+      const d = OC[src]; let bi = 0, bd = 1e9;
+      d.gmr.forEach((v, i) => { const q = Math.abs(v - g); if (q < bd) { bd = q; bi = i; } });
+      return d[key][bi];
+    };
+    showTip(`<div class="tr"><span class="tk">GMR</span><b>${g.toFixed(3)}</b></div>
+      <div class="tr"><span class="tk" style="color:var(--pbpk)">PBPK</span><b>${pct(near("PBPK"))}</b></div>
+      <div class="tr"><span class="tk" style="color:var(--poppk)">PopPK</span><b>${pct(near("PopPK"))}</b></div>`,
+      ev.clientX, ev.clientY);
+  });
+  hit.addEventListener("pointerleave", () => { hair.setAttribute("opacity", 0); hideTip(); });
+  document.getElementById(mount).appendChild(svg);
+}
+ocPanel("oc48", "a48");
+ocPanel("oc86", "a86");
+
+/* ================= Fig 2 : declared boundaries on the true curve ================= */
+/* each point: true GMR at the declared boundary -> the acceptance rate it really carries */
+const DP = {
+  hi: {
+    dom:[0.7880, 0.8095], limit:0.80, tick:[0.790, 0.795, 0.800, 0.805],
+    pts:[
+      {g:0.7917, n:48, v:0.0211, who:"PopPK joint",   t50:4.708, m:"sq", c:"poppk"},
+      {g:0.7917, n:86, v:0.0155, who:"PopPK joint",   t50:4.708, m:"sq", c:"poppk"},
+      {g:0.8000, n:48, v:0.0504, who:"PBPK",          t50:4.623, m:"dot", c:"pbpk"},
+      {g:0.8000, n:86, v:0.0538, who:"PBPK",          t50:4.623, m:"dot", c:"pbpk"},
+      {g:0.8049, n:48, v:0.0815, who:"PopPK per-arm", t50:4.574, m:"dot", c:"poppk"},
+      {g:0.8049, n:86, v:0.0962, who:"PopPK per-arm", t50:4.574, m:"dot", c:"poppk"}
+    ],
+    lab:[{g:0.7917,v:0.0211,txt:"PopPK joint",dy:-16,anch:"middle"},
+         {g:0.8000,v:0.0538,txt:"PBPK",dy:-15,anch:"middle"},
+         {g:0.8049,v:0.0962,txt:"PopPK per-arm",dy:-15,anch:"end"}]
+  },
+  lo: {
+    dom:[1.2430, 1.2990], limit:1.25, tick:[1.25, 1.26, 1.27, 1.28, 1.29],
+    pts:[
+      {g:1.2500, n:48, v:0.0482, who:"PBPK",          t50:1.457, m:"dot", c:"pbpk"},
+      {g:1.2500, n:86, v:0.0512, who:"PBPK",          t50:1.457, m:"dot", c:"pbpk"},
+      {g:1.2694, n:48, v:0.0140, who:"PopPK per-arm", t50:1.359, m:"dot", c:"poppk"},
+      {g:1.2694, n:86, v:0.0072, who:"PopPK per-arm", t50:1.359, m:"dot", c:"poppk"},
+      {g:1.2930, n:48, v:0.0016, who:"PopPK joint",   t50:1.250, m:"sq", c:"poppk"},
+      {g:1.2930, n:86, v:0.0005, who:"PopPK joint",   t50:1.250, m:"sq", c:"poppk"}
+    ],
+    lab:[{g:1.2500,v:0.0512,txt:"PBPK",dy:-15,anch:"start"},
+         {g:1.2694,v:0.0140,txt:"PopPK per-arm",dy:-14,anch:"middle"},
+         {g:1.2930,v:0.0016,txt:"PopPK joint",dy:-14,anch:"end"}]
+  }
+};
+
+function dotPanel(mount, spec){
+  const W = 500, H = 330, M = {t:26, r:20, b:46, l:50};
+  const x0 = M.l, x1 = W - M.r, y0 = M.t, y1 = H - M.b;
+  const [gLo, gHi] = spec.dom, vHi = 0.11;
+  const X = g => x0 + (g - gLo) / (gHi - gLo) * (x1 - x0);
+  const Y = v => y1 - v / vHi * (y1 - y0);
+  const svg = el("svg", {viewBox:`0 0 ${W} ${H}`, role:"img",
+    "aria-label":"Declared BE boundaries plotted as true GMR against the acceptance rate they carry."});
+
+  /* the non-bioequivalent side, shaded */
+  const outX = spec.limit === 0.80 ? [x0, X(0.80)] : [X(1.25), x1];
+  svg.appendChild(el("rect", {x:outX[0], y:y0, width:outX[1]-outX[0], height:y1-y0,
+    fill:"var(--warn-fill)"}));
+  const ol = el("text", {x:(outX[0]+outX[1])/2, y:y0-9, "text-anchor":"middle", class:"ax"});
+  ol.textContent = "outside BE"; svg.appendChild(ol);
+
+  /* grid */
+  [0, 0.025, 0.05, 0.075, 0.10].forEach(v => {
+    svg.appendChild(el("line", {x1:x0, x2:x1, y1:Y(v), y2:Y(v), stroke:"var(--grid)", "stroke-width":1}));
+    const t = el("text", {x:x0-9, y:Y(v)+3.5, "text-anchor":"end", class:"ax"});
+    t.textContent = (100*v).toFixed(1) + "%"; svg.appendChild(t);
+  });
+  /* nominal alpha */
+  svg.appendChild(el("line", {x1:x0, x2:x1, y1:Y(0.05), y2:Y(0.05),
+    stroke:"var(--band)", "stroke-width":1.5, "stroke-dasharray":"5 3"}));
+  const al = el("text", {x:x1, y:Y(0.05)-6, "text-anchor":"end", class:"nlab"});
+  al.textContent = "nominal 5%"; svg.appendChild(al);
+  /* the BE limit */
+  svg.appendChild(el("line", {x1:X(spec.limit), x2:X(spec.limit), y1:y0, y2:y1,
+    stroke:"var(--band)", "stroke-width":1.5}));
+
+  /* axes */
+  svg.appendChild(el("line", {x1:x0, x2:x1, y1:y1, y2:y1, stroke:"var(--rule)", "stroke-width":1.5}));
+  spec.tick.forEach(g => {
+    svg.appendChild(el("line", {x1:X(g), x2:X(g), y1:y1, y2:y1+5, stroke:"var(--rule)", "stroke-width":1}));
+    const t = el("text", {x:X(g), y:y1+18, "text-anchor":"middle", class:"ax"});
+    t.textContent = g.toFixed(3); svg.appendChild(t);
+  });
+  const xt = el("text", {x:(x0+x1)/2, y:H-8, "text-anchor":"middle", class:"axt"});
+  xt.textContent = "true GMR at the declared boundary"; svg.appendChild(xt);
+  const yt = el("text", {x:0, y:0, class:"axt", transform:`translate(13,${(y0+y1)/2}) rotate(-90)`, "text-anchor":"middle"});
+  yt.textContent = "true type I error"; svg.appendChild(yt);
+
+  /* connector between the two n at each boundary, so the pair reads as one boundary */
+  const byG = {};
+  spec.pts.forEach(p => { (byG[p.g] = byG[p.g] || []).push(p); });
+  Object.values(byG).forEach(pair => {
+    if (pair.length === 2) svg.appendChild(el("line",
+      {x1:X(pair[0].g), x2:X(pair[1].g), y1:Y(pair[0].v), y2:Y(pair[1].v),
+       stroke:`var(--${pair[0].c})`, "stroke-width":1, opacity:".45"}));
+  });
+
+  /* marks: filled = n 48, hollow = n 86 (secondary encoding, not colour alone) */
+  spec.pts.forEach(p => {
+    const col = `var(--${p.c})`, cx = X(p.g), cy = Y(p.v);
+    let mark;
+    if (p.m === "sq"){
+      mark = el("rect", {x:cx-5, y:cy-5, width:10, height:10,
+        fill: p.n === 48 ? col : "var(--ground)", stroke:col, "stroke-width":2});
+    } else {
+      mark = el("circle", {cx, cy, r:5.5,
+        fill: p.n === 48 ? col : "var(--ground)", stroke:col, "stroke-width":2});
+    }
+    mark.style.cursor = "pointer";
+    svg.appendChild(mark);
+    const hitr = el("circle", {cx, cy, r:14, fill:"transparent", style:"cursor:pointer"});
+    hitr.addEventListener("pointerenter", ev => showTip(
+      `<div class="tr"><span class="tk">boundary</span><b>${p.who}</b></div>
+       <div class="tr"><span class="tk">declared T50</span><b>${p.t50.toFixed(3)} h</b></div>
+       <div class="tr"><span class="tk">true GMR there</span><b>${p.g.toFixed(4)}</b></div>
+       <div class="tr"><span class="tk">true type I error</span><b>${pct(p.v)}</b></div>
+       <div class="tr"><span class="tk">study size</span><b>n = ${p.n}</b></div>`,
+      ev.clientX, ev.clientY));
+    hitr.addEventListener("pointerleave", hideTip);
+    svg.appendChild(hitr);
+  });
+
+  /* direct labels */
+  spec.lab.forEach(L => {
+    const t = el("text", {x:X(L.g), y:Y(L.v)+L.dy, "text-anchor":L.anch, class:"dlab",
+      fill: L.txt === "PBPK" ? "var(--pbpk)" : "var(--poppk)"});
+    t.textContent = L.txt; svg.appendChild(t);
+  });
+
+  document.getElementById(mount).appendChild(svg);
+}
+/* ================= Fig 3 : the crossing at the limit =================
+   Dense, high-replicate OC through the neighbourhood of GMR 0.80, from
+   08_export_zoom_oc.jl (20 000 trials x 5 seeds per point). */
+const Z = {
+  gmr:[0.8157,0.8136,0.81152,0.80945,0.8074,0.80536,0.80333,0.80132,0.79933,0.79734,0.79537,0.79341,0.79147,0.78954,0.78762,0.78571,0.78382,0.78194,0.78007,0.77822],
+  a48:[0.18939,0.16411,0.13981,0.11857,0.1,0.08327,0.069,0.05719,0.04632,0.03808,0.03053,0.0243,0.01926,0.01538,0.01212,0.00951,0.00723,0.00569,0.00435,0.00321],
+  a86:[0.27071,0.22711,0.18716,0.15349,0.12396,0.09858,0.07717,0.05915,0.04492,0.03351,0.02489,0.01818,0.01314,0.00935,0.00669,0.00464,0.00344,0.00237,0.00169,0.00107]
+};
+function zoomPanel(mount){
+  const W = 1040, H = 400, M = {t:24, r:150, b:50, l:62};
+  const x0 = M.l, x1 = W - M.r, y0 = M.t, y1 = H - M.b;
+  const gLo = 0.7770, gHi = 0.8175, vHi = 0.29;
+  const X = g => x0 + (g - gLo) / (gHi - gLo) * (x1 - x0);
+  const Y = v => y1 - v / vHi * (y1 - y0);
+  const svg = el("svg", {viewBox:`0 0 ${W} ${H}`, role:"img",
+    "aria-label":"Acceptance rate near the 0.80 BE limit for 48 and 86 subjects; the two curves cross at GMR 0.80 where both equal 5 percent."});
+
+  /* outside-BE shading, left of the limit */
+  svg.appendChild(el("rect", {x:x0, y:y0, width:X(0.80)-x0, height:y1-y0, fill:"var(--warn-fill)"}));
+  const ol = el("text", {x:(x0+X(0.80))/2, y:y0-8, "text-anchor":"middle", class:"ax"});
+  ol.textContent = "outside BE  (GMR < 0.80)"; svg.appendChild(ol);
+  const il = el("text", {x:(X(0.80)+x1)/2, y:y0-8, "text-anchor":"middle", class:"ax"});
+  il.textContent = "inside BE"; svg.appendChild(il);
+
+  /* grid */
+  [0, 0.05, 0.10, 0.15, 0.20, 0.25].forEach(v => {
+    svg.appendChild(el("line", {x1:x0, x2:x1, y1:Y(v), y2:Y(v),
+      stroke:"var(--grid)", "stroke-width":1}));
+    const t = el("text", {x:x0-9, y:Y(v)+3.5, "text-anchor":"end", class:"ax"});
+    t.textContent = (100*v).toFixed(0) + "%"; svg.appendChild(t);
+  });
+  /* the 5% line and the limit */
+  svg.appendChild(el("line", {x1:x0, x2:x1, y1:Y(0.05), y2:Y(0.05),
+    stroke:"var(--band)", "stroke-width":1.5, "stroke-dasharray":"5 3"}));
+  svg.appendChild(el("line", {x1:X(0.80), x2:X(0.80), y1:y0, y2:y1,
+    stroke:"var(--band)", "stroke-width":1.5}));
+
+  /* axes */
+  svg.appendChild(el("line", {x1:x0, x2:x1, y1:y1, y2:y1, stroke:"var(--rule)", "stroke-width":1.5}));
+  [0.78, 0.785, 0.79, 0.795, 0.80, 0.805, 0.81, 0.815].forEach(g => {
+    svg.appendChild(el("line", {x1:X(g), x2:X(g), y1:y1, y2:y1+5, stroke:"var(--rule)", "stroke-width":1}));
+    const t = el("text", {x:X(g), y:y1+18, "text-anchor":"middle", class:"ax"});
+    t.textContent = g.toFixed(3); svg.appendChild(t);
+  });
+  const xt = el("text", {x:(x0+x1)/2, y:H-10, "text-anchor":"middle", class:"axt"});
+  xt.textContent = "true GMR (test / reference)"; svg.appendChild(xt);
+  const yt = el("text", {x:0, y:0, class:"axt", transform:`translate(15,${(y0+y1)/2}) rotate(-90)`, "text-anchor":"middle"});
+  yt.textContent = "P(conclude BE)"; svg.appendChild(yt);
+
+  /* the two curves */
+  [["a48","n48","n = 48"], ["a86","n86","n = 86"]].forEach(([k, c, lab]) => {
+    const pts = Z.gmr.map((g, i) => [g, Z[k][i]]).sort((p, q) => p[0] - q[0]);
+    svg.appendChild(el("path", {
+      d: pts.map((p, i) => `${i ? "L" : "M"}${X(p[0]).toFixed(2)},${Y(p[1]).toFixed(2)}`).join(""),
+      fill:"none", stroke:`var(--${c})`, "stroke-width":2.5, "stroke-linejoin":"round"}));
+    /* direct label at the right end of each curve */
+    const last = pts[pts.length - 1];
+    const t = el("text", {x:X(last[0])+10, y:Y(last[1])+4, class:"dlab", fill:`var(--${c})`});
+    t.textContent = lab; svg.appendChild(t);
+  });
+
+  /* the crossing */
+  svg.appendChild(el("circle", {cx:X(0.80), cy:Y(0.0497), r:6,
+    fill:"none", stroke:"var(--band)", "stroke-width":2}));
+  const ct = el("text", {x:X(0.80)+14, y:Y(0.0497)-14, class:"dlab", fill:"var(--band)"});
+  ct.textContent = "both 5% at the limit"; svg.appendChild(ct);
+
+  /* hover readout */
+  const hair = el("line", {x1:0, x2:0, y1:y0, y2:y1, stroke:"var(--muted)", "stroke-width":1, opacity:0});
+  svg.appendChild(hair);
+  const hit = el("rect", {x:x0, y:y0, width:x1-x0, height:y1-y0, fill:"transparent", style:"cursor:crosshair"});
+  svg.appendChild(hit);
+  hit.addEventListener("pointermove", ev => {
+    const b = svg.getBoundingClientRect();
+    const g = gLo + ((ev.clientX - b.left) / b.width * W - x0) / (x1 - x0) * (gHi - gLo);
+    let bi = 0, bd = 1e9;
+    Z.gmr.forEach((v, i) => { const q = Math.abs(v - g); if (q < bd) { bd = q; bi = i; } });
+    hair.setAttribute("x1", X(Z.gmr[bi])); hair.setAttribute("x2", X(Z.gmr[bi]));
+    hair.setAttribute("opacity", .5);
+    showTip(`<div class="tr"><span class="tk">true GMR</span><b>${Z.gmr[bi].toFixed(4)}</b></div>
+      <div class="tr"><span class="tk" style="color:var(--n48)">n = 48</span><b>${pct(Z.a48[bi])}</b></div>
+      <div class="tr"><span class="tk" style="color:var(--n86)">n = 86</span><b>${pct(Z.a86[bi])}</b></div>`,
+      ev.clientX, ev.clientY);
+  });
+  hit.addEventListener("pointerleave", () => { hair.setAttribute("opacity", 0); hideTip(); });
+  document.getElementById(mount).appendChild(svg);
+}
+zoomPanel("zoom");
+
+dotPanel("dp_hi", DP.hi);
+dotPanel("dp_lo", DP.lo);
+</script>
+
+</body>
+</html>

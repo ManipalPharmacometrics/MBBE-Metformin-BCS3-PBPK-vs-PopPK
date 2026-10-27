@@ -1,0 +1,25 @@
+
+Safe-space boundaries (power >= 0.8) — PBPK vs PopPK:
+16×5 DataFrame
+ Row │ endpoint                source  n_subj  ss_lo    ss_hi
+     │ String                  String  Int64   Float64  Float64
+─────┼──────────────────────────────────────────────────────────
+   1 │ AUC_inf                 PBPK        48     1.0      4.95
+   2 │ AUC_inf                 PopPK       48     1.0      5.45
+   3 │ AUC_inf                 PBPK        86     1.0      5.05
+   4 │ AUC_inf                 PopPK       86     1.0      5.6
+   5 │ AUC_tEnd                PBPK        48     1.0      4.6
+   6 │ AUC_tEnd                PopPK       48     1.25     4.75
+   7 │ AUC_tEnd                PBPK        86     1.0      4.7
+   8 │ AUC_tEnd                PopPK       86     1.0      4.9
+   9 │ Cmax                    PBPK        48     2.0      4.15
+  10 │ Cmax                    PopPK       48     2.2      4.15
+  11 │ Cmax                    PBPK        86     1.8      4.25
+  12 │ Cmax                    PopPK       86     2.1      4.2
+  13 │ Joint (Cmax & AUC_0-t)  PBPK        48     1.95     4.1
+  14 │ Joint (Cmax & AUC_0-t)  PopPK       48     2.15     4.1
+  15 │ Joint (Cmax & AUC_0-t)  PBPK        86     1.85     4.25
+  16 │ Joint (Cmax & AUC_0-t)  PopPK       86     2.1      4.2
+
+Wrote: be_overlay_gmr.csv, safe_space_overlay_boundaries.csv,
+       fig_overlay_gmr.png, fig_overlay_safespace_*.png -> <repo>/poppk-per-arm/poppk_pumas/output_sparse

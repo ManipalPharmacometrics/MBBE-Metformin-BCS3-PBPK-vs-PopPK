@@ -1,0 +1,17 @@
+endpoint,source,n_subj,ss_lo,ss_hi
+Cmax,PBPK,48,2.0,4.15
+Cmax,PopPK,48,2.2,4.15
+Cmax,PBPK,86,1.8,4.25
+Cmax,PopPK,86,2.1,4.2
+AUC_tEnd,PBPK,48,1.0,4.6
+AUC_tEnd,PopPK,48,1.25,4.75
+AUC_tEnd,PBPK,86,1.0,4.7
+AUC_tEnd,PopPK,86,1.0,4.9
+AUC_inf,PBPK,48,1.0,4.95
+AUC_inf,PopPK,48,1.0,5.45
+AUC_inf,PBPK,86,1.0,5.05
+AUC_inf,PopPK,86,1.0,5.6
+Joint (Cmax & AUC_0-t),PBPK,48,1.95,4.1
+Joint (Cmax & AUC_0-t),PopPK,48,2.15,4.1
+Joint (Cmax & AUC_0-t),PBPK,86,1.85,4.25
+Joint (Cmax & AUC_0-t),PopPK,86,2.1,4.2
