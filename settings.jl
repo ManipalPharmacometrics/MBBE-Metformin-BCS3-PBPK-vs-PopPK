@@ -45,5 +45,8 @@ const N_TRIAL_TYPE1 = 20_000                     # SE of a 5% rate ~0.15 percent
 const T50_STEP_TYPE1 = 0.005                     # finer grid to locate the boundary
 const N_TRIAL_OC    = 2_000                      # trials per point of the operating-characteristic figure
 
+# Step 6b (cross-check of be_test against pumas_be)
+const N_TRIAL_CHECK = 2_000                      # trials per boundary point, run through both tests
+
 # ---- the two PopPK models ---------------------------------------------------
 const MODELS = ["perarm", "joint"]               # model_perarm.jl, model_joint.jl

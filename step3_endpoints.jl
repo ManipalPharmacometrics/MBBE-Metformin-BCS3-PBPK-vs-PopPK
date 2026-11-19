@@ -7,38 +7,32 @@
 #      results/<model>/step3_check_vs_pbpk.csv     geometric means by formulation,
 #                                                  PopPK / PBPK ratio
 #
-#   Cmax     = highest predicted concentration (0.05 h grid)
-#   AUC_tEnd = AUC 0–24 h, linear trapezoid while rising, log trapezoid while falling
+#   Cmax     = NCA.cmax: highest predicted concentration (0.05 h grid)
+#   AUC_tEnd = NCA.auc (auctype :last, method :linuplogdown): AUC 0–24 h,
+#              linear trapezoid while rising, log trapezoid while falling
 #
 # Units: Cmax µmol/L. AUC: PopPK µmol·h/L; PK-Sim (data/pbpk_endpoints.csv)
 # µmol·min/L. Units cancel in every test/reference ratio, so steps 4–6 use
 # both files as they are; the check table below converts PK-Sim AUC to hours.
 # =============================================================================
 
-using CSV, DataFrames, Statistics
+using CSV, DataFrames, Statistics, NCA
 include("settings.jl")
-
-"AUC by linear-up / log-down trapezoids."
-function auc_lin_up_log_down(t, c)
-    auc = 0.0
-    for i in 1:length(t)-1
-        dt, c1, c2 = t[i+1] - t[i], c[i], c[i+1]
-        auc += (c1 > 0 && c2 > 0 && c2 < c1) ? dt * (c1 - c2) / (log(c1) - log(c2)) :
-                                               dt * (c1 + c2) / 2
-    end
-    auc
-end
 
 geomean(x) = exp(mean(log.(x)))
 pbpk = CSV.read(joinpath(DATA, "pbpk_endpoints.csv"), DataFrame)
 
 for model_name in MODELS
     dir   = joinpath(RESULTS, model_name)
-    ipred = sort(CSV.read(joinpath(dir, "step2_ipred.csv"), DataFrame), [:T50, :IndividualId, :time])
+    ipred = CSV.read(joinpath(dir, "step2_ipred.csv"), DataFrame)
 
-    poppk = combine(groupby(ipred, [:T50, :IndividualId]),
-                    :ipred => maximum => :Cmax,
-                    [:time, :ipred] => auc_lin_up_log_down => :AUC_tEnd)
+    # Pumas NCA package: one NCA subject per (T50, IndividualId)
+    pop   = read_nca(ipred; id = :IndividualId, time = :time, observations = :ipred,
+                     group = [:T50], verbose = false)
+    nca   = innerjoin(NCA.cmax(pop), NCA.auc(pop; auctype = :last, method = :linuplogdown),
+                      on = [:id, :T50])
+    poppk = sort(DataFrame(T50 = nca.T50, IndividualId = parse.(Int, string.(nca.id)),
+                           Cmax = nca.cmax, AUC_tEnd = nca.auc), [:T50, :IndividualId])
     CSV.write(joinpath(dir, "step3_poppk_endpoints.csv"), poppk)
 
     a = combine(groupby(poppk, :T50), :Cmax => geomean => :PopPK_Cmax, :AUC_tEnd => geomean => :PopPK_AUC)

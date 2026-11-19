@@ -1,0 +1,25 @@
+Pass rate at the BE boundary, our be_test vs pumas_be (same trials):
+18×10 DataFrame
+ Row │ source   model   endpoint  side     T50      n_subj  n_trial  pass_rate_be_test  pass_rate_pumas_be  same_decision
+     │ String7  String  String15  String7  Float64  Int64   Int64    Float64            Float64             Float64
+─────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1 │ PBPK     both    Cmax      low      1.50719      48     2000             0.055               0.054          0.998
+   2 │ PBPK     both    Cmax      low      1.50719      86     2000             0.0475              0.046          0.9985
+   3 │ PBPK     both    Cmax      high     4.45918      48     2000             0.0435              0.043          0.9995
+   4 │ PBPK     both    Cmax      high     4.45918      86     2000             0.049               0.0495         0.9985
+   5 │ PBPK     both    AUC_tEnd  high     4.90199      48     2000             0.041               0.0415         0.9985
+   6 │ PBPK     both    AUC_tEnd  high     4.90199      86     2000             0.0505              0.0495         0.998
+   7 │ PopPK    perarm  Cmax      low      1.53552      48     2000             0.059               0.0585         0.9985
+   8 │ PopPK    perarm  Cmax      low      1.53552      86     2000             0.0505              0.0515         0.999
+   9 │ PopPK    perarm  Cmax      high     4.37739      48     2000             0.0465              0.0455         0.998
+  10 │ PopPK    perarm  Cmax      high     4.37739      86     2000             0.0455              0.0455         0.999
+  11 │ PopPK    perarm  AUC_tEnd  high     4.93391      48     2000             0.0425              0.043          0.9985
+  12 │ PopPK    perarm  AUC_tEnd  high     4.93391      86     2000             0.0485              0.049          0.9975
+  13 │ PopPK    joint   Cmax      low      1.54398      48     2000             0.058               0.058          0.998
+  14 │ PopPK    joint   Cmax      low      1.54398      86     2000             0.0505              0.0515         0.998
+  15 │ PopPK    joint   Cmax      high     4.48438      48     2000             0.0465              0.047          0.9985
+  16 │ PopPK    joint   Cmax      high     4.48438      86     2000             0.0445              0.045          0.9995
+  17 │ PopPK    joint   AUC_tEnd  high     5.20708      48     2000             0.0435              0.0425         0.998
+  18 │ PopPK    joint   AUC_tEnd  high     5.20708      86     2000             0.0485              0.048          0.9995
+
+Lowest agreement: 99.75% of trials
