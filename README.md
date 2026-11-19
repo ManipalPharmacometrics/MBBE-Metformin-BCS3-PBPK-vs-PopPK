@@ -25,6 +25,7 @@ PopPK endpoints.
 | 4 | `step4_gmr.jl` | Test/reference GMR with 90% CI per formulation, PBPK vs PopPK | `<model>/step4_gmr.csv`, `fig_step4_gmr.png` |
 | 5 | `step5_power_safe_space.jl` | Power vs T50 and the safe space (power ≥ 80%) | `<model>/step5_power.csv`, `step5_safe_space.csv`, `fig_step5_power.png` |
 | 6 | `step6_type1_error.jl` | BE boundary and the type I error there | `<model>/step6_boundaries.csv`, `step6_type1_error.csv`, `step6_tost_control.csv`, figures |
+| 7 | `step7_ivivc.jl` | IVIVC check: PopPK release time vs the PK-Sim T50 (branch `ivivc-qc`) | `step7_ivivc.csv`, `step7_ivivc_fit.csv`, `fig_step7_ivivc.png` |
 
 `<model>` is `perarm` or `joint`. Inputs are in `data/`:
 - `pksim_profiles/`: PK-Sim plasma profiles, 0–24 h, every 3 min.
@@ -83,5 +84,27 @@ so it is the real type I error of a safe space set by that method; 5% is correct
 4. `step3`: PopPK/PBPK geometric-mean ratios close to 1 (`step3_check_vs_pbpk.csv`).
 5. `be_functions.jl`: the 90% CI TOST, the trial simulation and the log-log interpolation.
 6. `step6`: the TOST control passes about 5% (reference × 0.80).
+
+## Step 7: how PopPK relates to PBPK (IVIVC check)
+
+PopPK is linked to PBPK in two ways:
+- **Through the data.** The PopPK fits use concentrations sampled from the PK-Sim profiles.
+- **Through the decisions.** Steps 4–6 run the same BE code on both sets of endpoints.
+
+Step 7 checks a third possible link: does the PopPK release follow the release set in PK-Sim (an
+in vivo IVIVC)? It compares the PopPK time to 50% released, `Alpha·ln(2)^(1/Gamma)`, with the
+PK-Sim T50.
+
+| | Estimate | 95% CI | An IVIVC would give |
+|---|---|---|---|
+| Per-arm fits: slope of log(PopPK T50) on log(PK-Sim T50) | −0.012 | −0.045 to 0.021 | 1 |
+| Joint model: estimated `slope` | 0.029 | −0.029 to 0.087 | 1 |
+
+**Result: no IVIVC.** The PopPK release time stays at 2.4–2.6 h for every formulation, while the
+PK-Sim T50 runs from 1 to 7 h. The formulation effect is absorbed into the apparent clearance
+instead (per-arm CL rises from 35 to 59 L/h, `step7_ivivc.csv`). The PopPK model therefore
+reproduces each formulation's Cmax and AUC well enough for BE (steps 4–6), but its release
+parameters are not the PK-Sim release. They should not be read as an in vitro or in vivo
+release-rate estimate.
 
 Not in this branch: sparse sampling, AUC to infinity, and the PK-Sim model build.
