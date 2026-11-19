@@ -26,6 +26,7 @@ PopPK endpoints.
 | 5 | `step5_power_safe_space.jl` | Power vs T50 and the safe space (power ≥ 80%) | `<model>/step5_power.csv`, `step5_safe_space.csv`, `fig_step5_power.png` |
 | 6 | `step6_type1_error.jl` | BE boundary and the type I error there | `<model>/step6_boundaries.csv`, `step6_type1_error.csv`, `step6_tost_control.csv`, figures |
 | 7 | `step7_ivivc.jl` | IVIVC check: PopPK release time vs the PK-Sim T50 (branch `ivivc-qc`) | `step7_ivivc.csv`, `step7_ivivc_fit.csv`, `fig_step7_ivivc.png` |
+| 8 | `step8_heldout_test.jl` | Held-out test: train on T50 1, 3, 7 h, predict 2, 3.5, 4, 5, 6 h (uses `model_joint_frel.jl`) | `heldout/step8_*.csv`, `heldout/fig_step8_gmr.png` |
 
 `<model>` is `perarm` or `joint`. Inputs are in `data/`:
 - `pksim_profiles/`: PK-Sim plasma profiles, 0–24 h, every 3 min.
@@ -109,5 +110,47 @@ instead (per-arm CL rises from 35 to 59 L/h, `step7_ivivc.csv`). The PopPK model
 reproduces each formulation's Cmax and AUC well enough for BE (steps 4–6), but its release
 parameters are not the PK-Sim release. They should not be read as an in vitro or in vivo
 release-rate estimate.
+
+## Step 8: can PopPK predict a formulation it was not fitted to?
+
+Train on T50 = 1, 3 and 7 h only, then predict the 5 held-out formulations. Each subject keeps the
+random effects from its reference (3 h) arm, and only T50 changes. Three methods are compared:
+- **joint**: `model_joint.jl`, with T50 acting on the release time only.
+- **joint_frel**: `model_joint_frel.jl`, which also lets bioavailability depend on T50:
+  F = (T50/3)^θ. The estimate is θ = −0.37.
+- **interp3**: no model; per-arm PopPK endpoints at 1, 3 and 7 h, interpolated between them.
+
+Cmax GMR at the held-out formulations:
+
+| T50 (h) | PBPK (truth) | joint | joint_frel | interp3 |
+|---|---|---|---|---|
+| 2.0 | 1.178 | 1.004 | 1.165 | 1.126 |
+| 3.5 | 0.924 | 0.998 | 0.944 | 0.899 |
+| 4.0 | 0.857 | 0.997 | 0.898 | 0.820 |
+| 5.0 | 0.744 | 0.995 | 0.825 | 0.703 |
+| 6.0 | 0.658 | 0.993 | 0.771 | 0.620 |
+
+Safe space, joint Cmax + AUC, with power ≥ 80% (T50, h):
+
+| n | PBPK | joint | joint_frel | interp3 |
+|---|---|---|---|---|
+| 48 | 2.05–4.00 | 1.0–7.0 (everything) | 2.00–4.45 | 1.75–3.75 |
+| 86 | 1.90–4.10 | 1.0–7.0 (everything) | 1.90–4.70 | 1.70–3.85 |
+
+**Result: no method predicts the held-out formulations well enough for BE.**
+- **joint** predicts no formulation effect at all (GMR ≈ 1 everywhere), so every T50 looks
+  bioequivalent.
+- **joint_frel** gets the direction right but underpredicts the effect away from the reference.
+  Its safe space runs to 4.45–4.70 h instead of 4.0–4.1 h, so it would call slower
+  formulations BE that are not. A single power law on F cannot fit the data: PK-Sim's Cmax falls
+  faster than its AUC, but a change in F moves both equally. The fit is off even at the trained
+  1 h and 7 h formulations.
+- **interp3** shifts the safe space towards faster release (1.75–3.75 h).
+
+So PopPK, even with T50 as a covariate on release and on bioavailability, cannot stand in for PBPK
+when predicting untested release rates for metformin. The per-arm results (steps 4–6) hold only for
+formulations that were actually simulated. Frel was also tested on all 8 formulations (31 Oct–2 Nov
+2026, not part of this branch): it improved the fit (ΔAIC −95) but worsened the BE decisions, and
+the base joint model was kept.
 
 Not in this branch: sparse sampling, AUC to infinity, and the PK-Sim model build.

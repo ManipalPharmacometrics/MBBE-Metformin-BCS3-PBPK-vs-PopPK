@@ -1,0 +1,9 @@
+n_subj,method,T50_low,T50_high
+48,PBPK,2.05,4.0
+48,joint,1.0,7.0
+48,joint_frel,2.0,4.45
+48,interp3,1.75,3.75
+86,PBPK,1.9,4.1
+86,joint,1.0,7.0
+86,joint_frel,1.9,4.7
+86,interp3,1.7,3.85

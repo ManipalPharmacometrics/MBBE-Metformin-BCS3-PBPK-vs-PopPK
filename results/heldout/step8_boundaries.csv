@@ -1,0 +1,9 @@
+method,side,boundary_T50,true_type1_n48,true_type1_n86
+PBPK,low,1.50719179586511,0.0493,0.05265
+PBPK,high,4.459184360612674,0.03115,0.04515
+joint,low,,,
+joint,high,,,
+joint_frel,low,1.6564624857292631,0.185,0.2621
+joint_frel,high,5.4325767006808166,0.0,0.0
+interp3,low,1.39957262352575,0.0121,0.00715
+interp3,high,4.147892657719174,0.538,0.77705
