@@ -18,13 +18,14 @@ PopPK endpoints.
 |---|---|---|---|
 | 0 | `settings.jl` | Every number used: dose, sampling times, error, CVs, study sizes, seeds | — |
 | 0 | `model_perarm.jl`, `model_joint.jl` | The two PopPK models (equations in the header) | — |
-| 0 | `be_functions.jl` | BE test, simulated BE trials, interpolation between formulations | — |
+| 0 | `be_functions.jl` | Fast paired BE test for the simulated trials (steps 5–6), interpolation between formulations | — |
 | 1 | `step1_build_dataset.jl` | Samples the PK-Sim profiles at 13 times, adds 15% error | `step1_dataset.csv` |
 | 2 | `step2_fit_poppk.jl` | Fits both models (FOCE) | `<model>/step2_parameters.csv`, `_standard_errors.csv`, `_ipred.csv` |
-| 3 | `step3_endpoints.jl` | Cmax and AUC 0–24 h per subject from the PopPK predictions; checks them against PK-Sim | `<model>/step3_poppk_endpoints.csv`, `step3_check_vs_pbpk.csv` |
-| 4 | `step4_gmr.jl` | Test/reference GMR with 90% CI per formulation, PBPK vs PopPK | `<model>/step4_gmr.csv`, `fig_step4_gmr.png` |
+| 3 | `step3_endpoints.jl` | Cmax and AUC 0–24 h per subject from the PopPK predictions (Pumas `NCA`); checks them against PK-Sim | `<model>/step3_poppk_endpoints.csv`, `step3_check_vs_pbpk.csv` |
+| 4 | `step4_gmr.jl` | Test/reference GMR with 90% CI per formulation, PBPK vs PopPK (Pumas `pumas_be`) | `<model>/step4_gmr.csv`, `fig_step4_gmr.png` |
 | 5 | `step5_power_safe_space.jl` | Power vs T50 and the safe space (power ≥ 80%) | `<model>/step5_power.csv`, `step5_safe_space.csv`, `fig_step5_power.png` |
 | 6 | `step6_type1_error.jl` | BE boundary and the type I error there | `<model>/step6_boundaries.csv`, `step6_type1_error.csv`, `step6_tost_control.csv`, figures |
+| 6b | `step6b_check_vs_pumas_be.jl` | Cross-check: our fast BE test vs `pumas_be` on the same simulated trials, at every boundary | `step6b_check_vs_pumas_be.csv` |
 
 `<model>` is `perarm` or `joint`. Inputs are in `data/`:
 - `pksim_profiles/`: PK-Sim plasma profiles, 0–24 h, every 3 min.
@@ -41,7 +42,8 @@ and Vc and a proportional error.
 
 ## How to run
 
-You need Julia 1.11 with Pumas; only step 2 uses Pumas. From this folder:
+You need Julia 1.11 with Pumas. Step 2 uses `Pumas`, step 3 `NCA`, steps 4 and 6b `Bioequivalence`
+(all part of the Pumas distribution). From this folder:
 
 ```bash
 export JULIA="julia --project=."     # or your Pumas command, e.g. with a Pumas sysimage
@@ -62,6 +64,27 @@ On 19 Nov 2026 all six steps were rerun and compared with the saved 30 Oct resul
 | GMR, 90% CI, pass/fail (step 4) | identical | identical |
 | Safe-space edges (step 5) | identical | identical |
 | Boundaries, type I error, TOST control (step 6) | identical | identical |
+
+### Standard Pumas functions (19 Nov 2026)
+
+The endpoints and the BE test now use the standard Pumas packages wherever one exists:
+
+- **Step 3: `NCA.cmax` and `NCA.auc`** (linear-up/log-down) replace our own trapezoid code. Cmax is
+  identical and AUC differs by at most 3×10⁻¹² (relative), so steps 5–6 did not need rerunning.
+- **Step 4: `pumas_be`** (2x2 crossover ANOVA) replaces our paired t-test. GMRs are identical
+  (≤ 10⁻¹³). The 90% CI limits move by at most 0.24%, because the ANOVA also fits a period and a
+  sequence effect, and no pass/fail decision changes. The reference row (reference vs itself) is
+  dropped, since it has no CI.
+- **Steps 5–6 keep the fast paired test (`be_test`)** for their hundreds of thousands of simulated
+  trials. **Step 6b** checks this test against `pumas_be`. At every BE boundary, where the true
+  GMR is exactly 0.80 or 1.25 and decisions are closest, 2,000 trials ran through both tests:
+
+| | Result |
+|---|---|
+| Same pass/fail decision | 99.75–99.95% of trials (18 boundary × study-size cases) |
+| Largest difference in pass rate | 0.15 percentage points |
+
+So the type I error and power from the fast test match what `pumas_be` gives.
 
 ## Key results (rich sampling)
 
@@ -84,7 +107,8 @@ The last row is how often a real BE study passes at the boundary each method wou
 2. `model_*.jl`: Weibull hazard and units (h, µmol, L, µmol/L).
 3. `step2`: lag fixed; FOCE; all fits converge (`results/logs/step2_fit_poppk.log`).
 4. `step3`: PopPK/PBPK geometric-mean ratios close to 1 (`step3_check_vs_pbpk.csv`).
-5. `be_functions.jl`: the 90% CI TOST, the trial simulation and the log-log interpolation.
+5. `be_functions.jl`: the trial simulation and the log-log interpolation; `step6b` shows its
+   paired TOST agrees with `pumas_be`.
 6. `step6`: the TOST control passes about 5% (reference × 0.80).
 
 Not in this branch: sparse sampling, AUC to infinity, and the PK-Sim model build.
