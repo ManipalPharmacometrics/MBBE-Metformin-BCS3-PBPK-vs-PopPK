@@ -1,0 +1,3 @@
+analysis,estimate,ci_lower,ci_upper,ivivc_would_give
+per-arm: log-log regression slope,-0.011992890029398925,-0.04506745559764972,0.021081675538851867,1.0
+joint model: estimated slope,0.02919839410963372,-0.02885832346910837,0.08725511168837581,1.0
