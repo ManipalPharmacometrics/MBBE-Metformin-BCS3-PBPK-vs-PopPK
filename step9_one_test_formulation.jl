@@ -21,6 +21,9 @@
 # Saturable uptake (model_window_sat.jl, one extra parameter Km) is fitted with
 # ka fixed at 0.3 and 1: "test5_sat_ka0.3". It contains the linear model
 # (Km -> infinity), so the two -2LL values can be compared directly.
+# Gastric emptying (model_window_ge.jl, one extra parameter kge): released drug
+# must leave the stomach before the window, ka fixed at 0.3 and 1:
+# "test5_ge_ka0.3". kge -> infinity gives the linear model back.
 # Prediction: each subject keeps the random effects of its reference arm; only
 # T50 (the dissolution curve) changes. Same 24 subjects as PK-Sim (paired BE).
 # Compared with PBPK (truth) and with the per-arm PopPK fits, which used data
@@ -32,10 +35,12 @@ include("settings.jl")
 include("be_functions.jl")
 include("model_window.jl")
 include("model_window_sat.jl")
+include("model_window_ge.jl")
 
 const TESTED   = [5.0, 2.0]                  # the one tested formulation (+ the reference)
 const KA_FIXED = [0.3, 1.0, 3.0]             # fixed ka values (1/h); "free" = estimated
 const KA_FIXED_SAT = [0.3, 1.0]              # fixed ka values for the saturable model
+const KA_FIXED_GE  = [0.3, 1.0]              # fixed ka values for the gastric-emptying model
 const OUT   = joinpath(RESULTS, "one_test"); mkpath(OUT)
 const PRED_TIMES = collect(0.0:0.05:24.0)
 
@@ -49,7 +54,8 @@ to_population(df) = read_pumas(df; id = :SUBJID, time = :time, amt = :amt, evid 
 refrows = data[data.T50 .== REF_T50, :]
 params = DataFrame(); predicted = Dict{String,DataFrame}()
 for tested in TESTED, (kind, model, kas) in (("", poppk_window, ["free"; KA_FIXED]),
-                                             ("sat_", poppk_window_sat, KA_FIXED_SAT)), ka in kas
+                                             ("sat_", poppk_window_sat, KA_FIXED_SAT),
+                                             ("ge_", poppk_window_ge, KA_FIXED_GE)), ka in kas
     name  = "test$(Int(tested))_$(kind)ka$(ka isa Number ? (isinteger(ka) ? Int(ka) : ka) : ka)"
     train = to_population(data[in.(data.T50, Ref([REF_T50, tested])), :])
     @info "fitting $name"
@@ -133,7 +139,7 @@ for (i, tested) in enumerate(TESTED), (k, ep) in enumerate(ENDPOINTS)
     vlines!(ax, setdiff(T50S, [REF_T50, tested]); color = (:gray, 0.15), linewidth = 12)   # predicted
     d = gmr[gmr.endpoint .== ep, :]
     scatterlines!(ax, d.T50, d.GMR_PBPK; color = :black, linewidth = 3, label = "PBPK (truth)")
-    for (m, c) in zip(params.model[params.tested_T50 .== tested], [:orange, :royalblue, :seagreen, :purple, :red, :magenta])
+    for (m, c) in zip(params.model[params.tested_T50 .== tested], [:orange, :royalblue, :seagreen, :purple, :red, :magenta, :brown, :teal])
         lines!(ax, d.T50, d[!, Symbol("GMR_", m)]; color = c, label = m)
     end
     k == 1 && axislegend(ax; position = :rt)

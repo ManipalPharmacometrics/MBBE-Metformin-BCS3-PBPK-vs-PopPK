@@ -28,7 +28,7 @@ PopPK endpoints.
 | 6b | `step6b_check_vs_pumas_be.jl` | Cross-check: our fast BE test vs `pumas_be` on the same simulated trials, at every boundary | `step6b_check_vs_pumas_be.csv` |
 | 7 | `step7_ivivc.jl` | IVIVC check: PopPK release time vs the PK-Sim T50 (branch `ivivc-qc`) | `step7_ivivc.csv`, `step7_ivivc_fit.csv`, `fig_step7_ivivc.png` |
 | 8 | `step8_heldout_test.jl` | Held-out test: train on T50 1, 3, 7 h, predict 2, 3.5, 4, 5, 6 h (uses `model_joint_frel.jl`) | `heldout/step8_*.csv`, `heldout/fig_step8_gmr.png` |
-| 9 | `step9_one_test_formulation.jl` | Fit to the reference + one test formulation (5 h, or 2 h as a check), predict the other 6; ka fixed at 0.3, 1, 3; saturable variant tried (uses `model_window.jl`, `model_window_sat.jl`) | `one_test/step9_*.csv`, `one_test/fig_step9_gmr.png` |
+| 9 | `step9_one_test_formulation.jl` | Fit to the reference + one test formulation (5 h, or 2 h as a check), predict the other 6; ka fixed at 0.3, 1, 3; saturable and gastric-emptying variants tried (uses `model_window.jl`, `model_window_sat.jl`, `model_window_ge.jl`) | `one_test/step9_*.csv`, `one_test/fig_step9_gmr.png` |
 
 `<model>` is `perarm` or `joint`. Inputs are in `data/`:
 - `pksim_profiles/`: PK-Sim plasma profiles, 0–24 h, every 3 min.
@@ -266,14 +266,38 @@ contains the linear model (Km → ∞), so −2LL compares directly.
 - **Conclusion:** saturable uptake does not explain the fast-release bias. The chosen step 9 model
   stays the linear window model with ka = 0.3.
 
+### Gastric emptying: much better fit, same BE predictions
+
+`model_window_ge.jl` adds a stomach step: released drug must empty into the small intestine (first
+order, kge) before the absorption window. kge → ∞ gives the linear model back.
+
+| Tested | ka (1/h) | kge (1/h) | −2LL with stomach | −2LL linear | CL (L/h) | Vc (L) | Cmax GMR at 1 h (PBPK 1.363) |
+|---|---|---|---|---|---|---|---|
+| 5 h | 0.3 | 1.09 | 1475 | 1863 | 19 | 18 | 1.684 |
+| 5 h | 1 | 0.81 | 1449 | 1989 | 34 | 43 | 1.652 |
+| 2 h | 0.3 | 0.99 | 1616 | 2092 | 18 | 19 | 1.686 |
+| 2 h | 1 | 0.60 | 1631 | 2171 | 31 | 39 | 1.647 |
+
+- **The profiles are described much better:** −2LL falls by 390–540 points for one extra parameter.
+  kge settles at 0.6–1.1 /h, a gastric half-time of 0.6–1.2 h. ka is no longer pushed to its lower
+  bound: with 5 h tested, ka = 1 now fits better than 0.3.
+- **The BE predictions do not change:** Cmax GMR at 1 h is still 1.65–1.69 against 1.36, and the
+  safe space is the same or slightly stricter (n = 86: 2.15–2.20 to 3.95–4.00 h, against PBPK
+  1.90–4.10 h). The true pass rate at every predicted boundary stays above 5% (14–92%), so it is
+  still never too lenient.
+- With ka = 1 the parameters are physiological (CL 31–34 L/h, Vc 39–43 L) but slow-release AUC is
+  overpredicted by up to 9% (7 h: 0.71 vs 0.65); with ka = 0.3 AUC is right but Vc is low (18 L).
+
+**Conclusion from steps 9a–c.** Three absorption mechanisms were tried (fixed ka, saturable uptake,
+gastric emptying). None removes the fast-release Cmax bias, although gastric emptying fits the
+profiles far better. A compartmental PopPK model fitted to two arms predicts slower release well,
+but extrapolating to faster release seems to need what PK-Sim has and these models lack, such as
+absorption that varies by intestinal segment. For faster release, PBPK stays the tool.
+
 ## Next steps
 
-1. **Fast-release bias.** A candidate not yet tried: in PK-Sim the tablet must leave the stomach,
-   where metformin is not absorbed, before the released drug reaches the small intestine.
-   Gastric emptying would then cap how fast drug arrives at the absorption site, however fast it is
-   released. That can be added as one transit step between release and the window.
-2. **Repeat with sparse sampling.**
-3. **Felodipine:** the same idea, with gut-wall CYP3A4 extraction depending on where the drug is
+1. **Repeat step 9 with sparse sampling.**
+2. **Felodipine:** the same idea, with gut-wall CYP3A4 extraction depending on where the drug is
    released in place of the absorption window.
 
 Not in this branch: sparse sampling, AUC to infinity, and the PK-Sim model build.
