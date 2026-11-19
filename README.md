@@ -71,10 +71,13 @@ On 19 Nov 2026 all six steps were rerun and compared with the saved 30 Oct resul
 | Safe space, joint Cmax + AUC, n = 48 (T50, h) | 2.05–4.00 | 2.10–3.90 | 2.10–3.95 |
 | Safe space, n = 86 (T50, h) | 1.90–4.10 | 1.95–4.05 | 2.05–4.10 |
 | Upper BE boundary, joint (T50, h) | 4.459 | 4.377 | 4.484 |
-| True type I error at that boundary, n = 86 | 4.5% | 14.4% | 2.9% |
+| PBPK (true) pass rate at that boundary, n = 86 | 4.5% | 14.4% | 2.9% |
 
-The last row is the PBPK pass rate at the boundary each method would declare. PBPK is the truth,
-so it is the real type I error of a safe space set by that method; 5% is correct.
+The last row is how often a real BE study passes at the boundary each method would declare
+(PBPK is the truth). A well-placed boundary gives 5%.
+- **Above 5%:** the method's boundary sits inside the true one, which is too strict.
+- **Below 5%:** it sits outside the true one, which is too lenient. Formulations between the two
+  boundaries would be called BE by the model but are not.
 
 ## What to check
 
