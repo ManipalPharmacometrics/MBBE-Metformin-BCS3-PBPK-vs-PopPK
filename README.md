@@ -153,4 +153,31 @@ formulations that were actually simulated. Frel was also tested on all 8 formula
 2026, not part of this branch): it improved the fit (ΔAIC −95) but worsened the BE decisions, and
 the base joint model was kept.
 
+## Next steps (in progress, 19 Nov 2026)
+
+**Step 9 (running): one tested formulation → BE for all the others.** Steps 7–8 show why the PopPK
+models cannot extrapolate: they estimate the release from plasma data, where it cannot be told
+apart from absorption. Step 9 changes what is estimated:
+
+- **Release is given, not estimated.** Each formulation's own dissolution curve, the PK-Sim Weibull
+  with its T50, shape 0.92 and no lag, is the model input (`model_window.jl`).
+- **Absorption window is estimated.** Absorption rate = `ka·exp(−t/τ)`: metformin is absorbed
+  mainly high in the small intestine, so drug released late is partly lost. One parameter τ gives
+  lower F for slower release, with Cmax falling more than AUC, which the Frel power law in step 8
+  could not reproduce.
+- **Disposition (CL, Vc) is shared** by all formulations.
+- **Test:** fit to the reference (3 h) and one test formulation (5 h) only, predict the other 6
+  from their dissolution curves, and compare GMRs, safe space and boundary pass rates with PBPK.
+  Script: `step9_one_test_formulation.jl`; outputs in `results/one_test/`.
+
+**If step 9 works**, PopPK plus the dissolution curves can give a safe space from a single tested
+formulation. The next checks are:
+1. Repeat with 2 h as the tested formulation, so the result does not depend on that choice.
+2. Repeat with sparse sampling.
+3. Apply the same idea to felodipine. There the mechanism is regional gut-wall CYP3A4 rather than
+   an absorption window: gut extraction depends on where the drug is released.
+
+**If it fails**, an empirical absorption term is not enough. Extrapolating across release rates
+then needs PBPK.
+
 Not in this branch: sparse sampling, AUC to infinity, and the PK-Sim model build.
