@@ -1,0 +1,13 @@
+endpoint,source,n_subj,pass_rate
+Cmax,PBPK,48,0.0515
+Cmax,PBPK,86,0.0539
+Cmax,PopPK,48,0.0515
+Cmax,PopPK,86,0.0539
+AUC_tEnd,PBPK,48,0.0515
+AUC_tEnd,PBPK,86,0.0539
+AUC_tEnd,PopPK,48,0.0515
+AUC_tEnd,PopPK,86,0.0539
+Joint,PBPK,48,0.00255
+Joint,PBPK,86,0.00225
+Joint,PopPK,48,0.00255
+Joint,PopPK,86,0.00225
