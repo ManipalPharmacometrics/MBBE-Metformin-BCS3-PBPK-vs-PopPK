@@ -28,7 +28,7 @@ PopPK endpoints.
 | 6b | `step6b_check_vs_pumas_be.jl` | Cross-check: our fast BE test vs `pumas_be` on the same simulated trials, at every boundary | `step6b_check_vs_pumas_be.csv` |
 | 7 | `step7_ivivc.jl` | IVIVC check: PopPK release time vs the PK-Sim T50 (branch `ivivc-qc`) | `step7_ivivc.csv`, `step7_ivivc_fit.csv`, `fig_step7_ivivc.png` |
 | 8 | `step8_heldout_test.jl` | Held-out test: train on T50 1, 3, 7 h, predict 2, 3.5, 4, 5, 6 h (uses `model_joint_frel.jl`) | `heldout/step8_*.csv`, `heldout/fig_step8_gmr.png` |
-| 9 | `step9_one_test_formulation.jl` | Fit to the reference + one test formulation (5 h, or 2 h as a check), predict the other 6; ka fixed at 0.3, 1, 3 (uses `model_window.jl`) | `one_test/step9_*.csv`, `one_test/fig_step9_gmr.png` |
+| 9 | `step9_one_test_formulation.jl` | Fit to the reference + one test formulation (5 h, or 2 h as a check), predict the other 6; ka fixed at 0.3, 1, 3; saturable variant tried (uses `model_window.jl`, `model_window_sat.jl`) | `one_test/step9_*.csv`, `one_test/fig_step9_gmr.png` |
 
 `<model>` is `perarm` or `joint`. Inputs are in `data/`:
 - `pksim_profiles/`: PK-Sim plasma profiles, 0–24 h, every 3 min.
@@ -245,11 +245,33 @@ Safe space, joint Cmax + AUC, power ≥ 80% (T50, h), and the BE boundaries:
 - The fixed ka value matters for AUC at the extremes (ka 1 or 3 move the 7 h AUC GMR by ±10%), so
   ka = 0.3 should be read as the best of the tested values, not as a measured absorption rate.
 
+### Saturable uptake: tried, did not help
+
+Metformin uptake is transporter-mediated, so a saturable version was fitted
+(`model_window_sat.jl`): uptake = `ka·Km·exp(−t/τ)·Gut/(Km + Gut)`, with ka fixed at 0.3 and 1. It
+contains the linear model (Km → ∞), so −2LL compares directly.
+
+| Tested | ka (1/h) | Km (µmol) | −2LL saturable | −2LL linear | Result |
+|---|---|---|---|---|---|
+| 5 h | 0.3 | 4.5×10⁹ (→ ∞) | 1863 | 1863 | identical to linear |
+| 5 h | 1 | 6.5×10⁶ (→ ∞) | 1989 | 1989 | identical to linear |
+| 2 h | 0.3 | 2.0×10¹⁰ (→ ∞) | 2092 | 2092 | identical to linear |
+| 2 h | 1 | 1,405 | 2127 | 2171 | window lost (τ → ∞) |
+
+- With the chosen ka = 0.3, **the data push Km to infinity**: no saturation is supported, and the
+  predictions are the linear model's.
+- The one fit that did saturate lost its absorption window instead. Fast release improved
+  (Cmax GMR at 1 h: 1.45 vs PBPK 1.36), but slow release broke (AUC GMR at 7 h: 0.85 vs 0.65), and
+  its upper boundary is too lenient (true pass rate there 0.1%, against 5%).
+- **Conclusion:** saturable uptake does not explain the fast-release bias. The chosen step 9 model
+  stays the linear window model with ka = 0.3.
+
 ## Next steps
 
-1. **Fast-release bias.** Metformin absorption is transporter-mediated and saturable. Replacing
-   `ka·Gut` with saturable uptake, `Vmax·Gut/(Km + Gut)` inside the same window, would make Cmax
-   less sensitive to fast release. This is the most likely fix for the low edge.
+1. **Fast-release bias.** A candidate not yet tried: in PK-Sim the tablet must leave the stomach,
+   where metformin is not absorbed, before the released drug reaches the small intestine.
+   Gastric emptying would then cap how fast drug arrives at the absorption site, however fast it is
+   released. That can be added as one transit step between release and the window.
 2. **Repeat with sparse sampling.**
 3. **Felodipine:** the same idea, with gut-wall CYP3A4 extraction depending on where the drug is
    released in place of the absorption window.
