@@ -28,7 +28,7 @@ PopPK endpoints.
 | 6b | `step6b_check_vs_pumas_be.jl` | Cross-check: our fast BE test vs `pumas_be` on the same simulated trials, at every boundary | `step6b_check_vs_pumas_be.csv` |
 | 7 | `step7_ivivc.jl` | IVIVC check: PopPK release time vs the PK-Sim T50 (branch `ivivc-qc`) | `step7_ivivc.csv`, `step7_ivivc_fit.csv`, `fig_step7_ivivc.png` |
 | 8 | `step8_heldout_test.jl` | Held-out test: train on T50 1, 3, 7 h, predict 2, 3.5, 4, 5, 6 h (uses `model_joint_frel.jl`) | `heldout/step8_*.csv`, `heldout/fig_step8_gmr.png` |
-| 9 | `step9_one_test_formulation.jl` | Fit to the reference + one test formulation (5 h), predict the other 6 (uses `model_window.jl`) | `one_test/step9_*.csv`, `one_test/fig_step9_gmr.png` |
+| 9 | `step9_one_test_formulation.jl` | Fit to the reference + one test formulation (5 h, or 2 h as a check), predict the other 6; ka fixed at 0.3, 1, 3 (uses `model_window.jl`) | `one_test/step9_*.csv`, `one_test/fig_step9_gmr.png` |
 
 `<model>` is `perarm` or `joint`. Inputs are in `data/`:
 - `pksim_profiles/`: PK-Sim plasma profiles, 0–24 h, every 3 min.
@@ -178,7 +178,7 @@ formulations that were actually simulated. Frel was also tested on all 8 formula
 2026, not part of this branch): it improved the fit (ΔAIC −95) but worsened the BE decisions, and
 the base joint model was kept.
 
-## Step 9: one tested formulation → BE for all the others (first run, 19 Nov 2026)
+## Step 9: one tested formulation → BE for all the others (19 Nov 2026)
 
 Steps 7–8 show why the PopPK models cannot extrapolate: they estimate the release from plasma
 data, where it cannot be told apart from absorption. Step 9 changes what is estimated:
@@ -187,52 +187,71 @@ data, where it cannot be told apart from absorption. Step 9 changes what is esti
   with its T50, shape 0.92 and no lag, is the model input (`model_window.jl`).
 - **Absorption window is estimated.** Absorption rate = `ka·exp(−t/τ)`: drug released late is
   partly never absorbed. **Disposition (CL, Vc) is shared** by all formulations.
-- **Test:** fit to the reference (3 h) and one test formulation (5 h) only, then predict the other
-  6 from their dissolution curves (`step9_one_test_formulation.jl`, `results/one_test/`).
+- **Test:** fit to the reference (3 h) plus ONE test formulation, then predict the other 6 from
+  their dissolution curves. The tested formulation is 5 h (main case) or 2 h (check).
+- **ka is fixed.** Fitted freely, ka ran to its 0.01/h bound and CL (1.1 L/h) and Vc (1.9 L) lost
+  their meaning: from oral data, the absorption scale cannot be separated from CL and Vc. So ka
+  is fixed at 0.3, 1 and 3 /h, to show how much the predictions depend on that choice.
 
-Cmax GMR (truth = PBPK; "all 8" = per-arm PopPK fitted to every formulation, for comparison):
+Fits (`results/one_test/step9_parameters.csv`):
 
-| T50 (h) | | PBPK | Step 9 (fitted to 3 h + 5 h) | Per-arm, all 8 fitted |
+| Tested | ka (1/h) | −2LL | τ (h) | CL (L/h) | Vc (L) |
+|---|---|---|---|---|---|
+| 5 h | free → 0.01 (bound) | 1833 | 4.9 | 1.1 | 1.9 |
+| 5 h | **0.3 (fixed)** | **1863** | **5.3** | **23** | **50** |
+| 5 h | 1 (fixed) | 1989 | 5.5 | 39 | 121 |
+| 5 h | 3 (fixed) | 2164 | 2.0 | 27 | 162 |
+| 2 h | free → 0.01 (bound) | 2051 | 4.5 | 1.0 | 2.1 |
+| 2 h | **0.3 (fixed)** | **2092** | **5.0** | **23** | **55** |
+| 2 h | 1 (fixed) | 2171 | → ∞ (no window) | 43 | 159 |
+| 2 h | 3 (fixed) | 2435 | 2.2 | 31 | 168 |
+
+**ka = 0.3 /h is the chosen model.** It is the best-fitting fixed value, its CL and Vc are
+physiological, and it gives nearly the same answer whichever formulation was tested (5 h or 2 h).
+With ka = 1 and 2 h tested, the window collapsed (τ → ∞), so that fit is degenerate.
+
+Cmax and AUC GMR, ka = 0.3 (truth = PBPK; "all 8" = per-arm PopPK fitted to every formulation):
+
+| T50 (h) | PBPK Cmax | tested 5 h | tested 2 h | all 8 | PBPK AUC | tested 5 h | tested 2 h | all 8 |
+|---|---|---|---|---|---|---|---|---|
+| 1.0 | 1.363 | 1.636 | 1.642 | 1.379 | 1.195 | 1.328 | 1.346 | 1.188 |
+| 2.0 | 1.178 | 1.236 | 1.238 | 1.176 | 1.120 | 1.145 | 1.151 | 1.109 |
+| 3.5 | 0.924 | 0.914 | 0.914 | 0.924 | 0.941 | 0.940 | 0.938 | 0.939 |
+| 4.0 | 0.857 | 0.843 | 0.842 | 0.850 | 0.887 | 0.886 | 0.883 | 0.886 |
+| 5.0 | 0.744 | 0.731 | 0.730 | 0.731 | 0.792 | 0.796 | 0.791 | 0.795 |
+| 6.0 | 0.658 | 0.646 | 0.645 | 0.625 | 0.714 | 0.722 | 0.716 | 0.718 |
+| 7.0 | 0.589 | 0.580 | 0.578 | 0.558 | 0.651 | 0.661 | 0.654 | 0.648 |
+
+Safe space, joint Cmax + AUC, power ≥ 80% (T50, h), and the BE boundaries:
+
+| | PBPK | ka 0.3, tested 5 h | ka 0.3, tested 2 h | all 8 |
 |---|---|---|---|---|
-| 1.0 | predicted | 1.363 | 1.662 | 1.379 |
-| 2.0 | predicted | 1.178 | 1.245 | 1.176 |
-| 3.5 | predicted | 0.924 | 0.912 | 0.924 |
-| 4.0 | predicted | 0.857 | 0.839 | 0.850 |
-| 5.0 | fitted | 0.744 | 0.724 | 0.731 |
-| 6.0 | predicted | 0.658 | 0.639 | 0.625 |
-| 7.0 | predicted | 0.589 | 0.572 | 0.558 |
-
-Safe space, joint Cmax + AUC, power ≥ 80% (T50, h):
-
-| n | PBPK | Step 9 | Per-arm, all 8 fitted |
-|---|---|---|---|
-| 48 | 2.05–4.00 | 2.25–3.85 | 2.10–3.90 |
-| 86 | 1.90–4.10 | 2.20–4.00 | 1.95–4.05 |
+| Safe space, n = 48 | 2.05–4.00 | 2.25–3.90 | 2.25–3.90 | 2.10–3.90 |
+| Safe space, n = 86 | 1.90–4.10 | 2.15–4.00 | 2.15–4.00 | 1.95–4.05 |
+| Lower boundary (true pass rate there, n = 86) | 1.51 (5%) | 1.95 (87%) | 1.95 (88%) | 1.54 (8%) |
+| Upper boundary (true pass rate there, n = 86) | 4.46 (5%) | 4.34 (22%) | 4.33 (24%) | 4.38 (14%) |
 
 **What this shows:**
-- **On the side that was tested (slower release, 3.5–7 h)** the model predicts the PBPK GMRs within
-  about 3%. That is as good as fitting every formulation, from two arms only.
-- **On the untested side (faster release, 1–2 h)** it overpredicts the effect: Cmax GMR 1.66 vs
-  1.36 at 1 h.
-- **The safe space comes out too strict on both sides,** never too lenient: 2.25–3.85 h against
-  2.05–4.00 h. The PBPK pass rate at the step 9 boundaries is 20–91%, all above 5%. So no formulation
-  that is truly not BE gets called BE, but some that are BE get excluded.
-
-**Caveat (must fix before relying on it):**
-- `ka` is on its lower bound (0.01/h), and CL = 1.06 L/h and Vc = 1.9 L are not physiological. With
-  oral data only, F, CL and Vc cannot be separated. The fit drifted to a corner where very little is
-  absorbed and CL and Vc are scaled down to match.
-- The predicted concentrations are unaffected: CL/F ≈ 40 L/h, as in the per-arm fits. The
-  individual parameter values are meaningless, though, and the release-time effect may depend on
-  that corner.
+- **Slower release (3.5–7 h) is predicted well** from two arms: Cmax and AUC GMRs within about 2%
+  of PBPK, as good as fitting all 8 formulations. This holds even when the tested formulation
+  was the faster 2 h one.
+- **Faster release is overpredicted**: Cmax GMR 1.64 vs 1.36 at 1 h. This is the case **even at
+  2 h when 2 h was the tested formulation** (1.24 vs 1.18). So the bias is not about
+  extrapolation or about ka. The absorption-window structure itself makes Cmax too sensitive to
+  fast release.
+- **The safe space is therefore too strict, never too lenient.** The lower edge is 2.15–2.25 h
+  against 1.90–2.05 h. The true pass rate at both predicted boundaries is above 5% (22–88%), so
+  no formulation that is not BE gets called BE.
+- The fixed ka value matters for AUC at the extremes (ka 1 or 3 move the 7 h AUC GMR by ±10%), so
+  ka = 0.3 should be read as the best of the tested values, not as a measured absorption rate.
 
 ## Next steps
 
-1. **Fix the scale problem in `model_window.jl`.** Either fix ka at a physiological value and
-   estimate τ, CL/F and Vc/F, or write the model in CL/F and Vc/F form. Then rerun step 9.
-2. **Repeat with 2 h as the tested formulation**, which tests extrapolation in the other direction.
-3. **Repeat with sparse sampling.**
-4. **Felodipine:** the same idea, with gut-wall CYP3A4 extraction depending on where the drug is
+1. **Fast-release bias.** Metformin absorption is transporter-mediated and saturable. Replacing
+   `ka·Gut` with saturable uptake, `Vmax·Gut/(Km + Gut)` inside the same window, would make Cmax
+   less sensitive to fast release. This is the most likely fix for the low edge.
+2. **Repeat with sparse sampling.**
+3. **Felodipine:** the same idea, with gut-wall CYP3A4 extraction depending on where the drug is
    released in place of the absorption window.
 
 Not in this branch: sparse sampling, AUC to infinity, and the PK-Sim model build.

@@ -19,6 +19,8 @@
 #   Central'=  ka*exp(-t/tau) * Gut - (CL/Vc) * Central
 #
 # IIV: tau, CL, Vc. Proportional error. Units: h, µmol, L, µmol/L.
+# ka is fixed in step 9 (0.3 /h chosen): from oral data it cannot be separated
+# from CL and Vc, and fitted freely it runs to its lower bound.
 # To predict an untested formulation: set its T50, keep everything else.
 # =============================================================================
 

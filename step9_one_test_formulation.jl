@@ -7,22 +7,30 @@
 #      step9_gmr.csv, step9_safe_space.csv, step9_boundaries.csv, fig_step9_gmr.png
 #
 # Scenario: a BE study has been run with the reference (T50 3 h) and ONE test
-# formulation (T50 5 h). Can a PopPK model fitted to those two arms predict the
-# other 6 formulations from their dissolution curves alone?
+# formulation. Can a PopPK model fitted to those two arms predict the other 6
+# formulations from their dissolution curves alone?
+#   Tested formulation: 5 h (main case) and 2 h (check: does the answer depend
+#   on which side was tested?).
 # Model: model_window.jl — release = the known dissolution curve (not
-# estimated); estimated = absorption window (ka, tau) and disposition (CL, Vc).
+# estimated); estimated = absorption window (tau) and disposition (CL, Vc).
+# ka is FIXED: from oral data alone, the absorption scale (ka) cannot be told
+# apart from CL and Vc (fitted freely, ka ran to its 0.01 bound and CL, Vc lost
+# their meaning). Fixing ka is the standard remedy; it is fixed at 0.3, 1 and
+# 3 1/h to show the predictions do not depend on the value chosen. The free-ka
+# fit is kept for comparison. Method names: "test5_ka1" = tested 5 h, ka 1.
 # Prediction: each subject keeps the random effects of its reference arm; only
 # T50 (the dissolution curve) changes. Same 24 subjects as PK-Sim (paired BE).
 # Compared with PBPK (truth) and with the per-arm PopPK fits, which used data
 # from all 8 formulations (the best PopPK can do when every arm is tested).
 # =============================================================================
 
-using Pumas, CSV, DataFrames, CairoMakie
+using Pumas, CSV, DataFrames, CairoMakie, NCA
 include("settings.jl")
 include("be_functions.jl")
 include("model_window.jl")
 
-const TRAIN = [3.0, 5.0]                     # reference + the one tested formulation
+const TESTED   = [5.0, 2.0]                  # the one tested formulation (+ the reference)
+const KA_FIXED = [0.3, 1.0, 3.0]             # fixed ka values (1/h); "free" = estimated
 const OUT   = joinpath(RESULTS, "one_test"); mkpath(OUT)
 const PRED_TIMES = collect(0.0:0.05:24.0)
 
@@ -32,41 +40,38 @@ T50S = sort(unique(data.T50))
 to_population(df) = read_pumas(df; id = :SUBJID, time = :time, amt = :amt, evid = :evid, cmt = :cmt,
                                observations = [:dv], covariates = [:T50, :IndividualId])
 
-"AUC by linear-up / log-down trapezoids (as step 3)."
-function auc_lin_up_log_down(t, c)
-    auc = 0.0
-    for i in 1:length(t)-1
-        dt, c1, c2 = t[i+1] - t[i], c[i], c[i+1]
-        auc += (c1 > 0 && c2 > 0 && c2 < c1) ? dt * (c1 - c2) / (log(c1) - log(c2)) : dt * (c1 + c2) / 2
-    end
-    auc
-end
-
-# ---- 1. fit both models on the 3 training formulations, predict all 8 -------------
-train = to_population(data[in.(data.T50, Ref(TRAIN)), :])
+# ---- 1. fit on the reference + one tested formulation, predict all 8 ---------------
 refrows = data[data.T50 .== REF_T50, :]
 params = DataFrame(); predicted = Dict{String,DataFrame}()
-for (name, model) in ("window" => poppk_window,)
-    @info "training $name on T50 = $TRAIN"
-    fitted = fit(model, train, init_params(model), FOCE())
+for tested in TESTED, ka in ["free"; KA_FIXED]
+    name  = "test$(Int(tested))_ka$(ka isa Number ? (isinteger(ka) ? Int(ka) : ka) : ka)"
+    model = poppk_window
+    train = to_population(data[in.(data.T50, Ref([REF_T50, tested])), :])
+    @info "fitting $name"
+    fitted = ka == "free" ? fit(model, train, init_params(model), FOCE()) :
+             fit(model, train, merge(init_params(model), (tvka = ka,)), FOCE(); constantcoef = (:tvka,))
     est = coef(fitted)
-    push!(params, merge((model = name, minus2LL = -2 * loglikelihood(fitted)),
+    push!(params, merge((model = name, tested_T50 = tested, minus2LL = -2 * loglikelihood(fitted)),
                         (; (k => (v isa Number ? v : missing) for (k, v) in pairs(est))...),
                         (omega_tau = est.Ω[1, 1], omega_cl = est.Ω[2, 2], omega_vc = est.Ω[3, 3]));
           cols = :union)
 
     # random effects of each subject's reference arm
     ebe = Dict(subj.id => η for (subj, η) in zip(train, empirical_bayes(fitted)))
-    ends = DataFrame()
+    prof = DataFrame()
     for t in T50S
         rows = copy(refrows); rows.T50 .= t                    # same subject, new formulation
         pop  = to_population(rows)
         for (subj, pred) in zip(pop, predict(model, pop, est, [ebe[s.id] for s in pop]; obstimes = PRED_TIMES))
-            push!(ends, (T50 = t, IndividualId = Int(subj.covariates(0.0).IndividualId),
-                         Cmax = maximum(pred.ipred.dv), AUC_tEnd = auc_lin_up_log_down(pred.time, pred.ipred.dv)))
+            append!(prof, DataFrame(T50 = t, IndividualId = Int(subj.covariates(0.0).IndividualId),
+                                    time = pred.time, ipred = pred.ipred.dv))
         end
     end
-    predicted[name] = ends
+    # Cmax and AUC 0–24 h with Pumas NCA, as in step 3
+    pop_nca = read_nca(prof; id = :IndividualId, time = :time, observations = :ipred, group = [:T50], verbose = false)
+    nca = innerjoin(NCA.cmax(pop_nca), NCA.auc(pop_nca; auctype = :last, method = :linuplogdown), on = [:id, :T50])
+    predicted[name] = DataFrame(T50 = nca.T50, IndividualId = parse.(Int, string.(nca.id)),
+                                Cmax = nca.cmax, AUC_tEnd = nca.auc)
 end
 perarm = CSV.read(joinpath(RESULTS, "perarm", "step3_poppk_endpoints.csv"), DataFrame)
 predicted["perarm_all8"] = perarm                       # benchmark: every formulation tested
@@ -74,12 +79,12 @@ CSV.write(joinpath(OUT, "step9_parameters.csv"), params)
 CSV.write(joinpath(OUT, "step9_predicted_endpoints.csv"),
           reduce(vcat, [insertcols(d, 1, :method => m) for (m, d) in predicted]))
 
-sources = ["PBPK" => pbpk; [m => predicted[m] for m in ("window", "perarm_all8")]]
+sources = ["PBPK" => pbpk; [m => predicted[m] for m in params.model]; "perarm_all8" => perarm]
 
 # ---- 2. GMR at every T50: predicted vs PBPK ----------------------------------------
 gmr = DataFrame()
 for t in T50S, ep in ENDPOINTS
-    row = (T50 = t, role = t in TRAIN ? "trained" : "held out", endpoint = ep)
+    row = (T50 = t, endpoint = ep)
     vals = [Symbol("GMR_", m) => gmr_at(pk, ep, t) for (m, pk) in sources]
     push!(gmr, merge(row, (; vals...)))
 end
@@ -114,17 +119,17 @@ for (m, pk) in sources, side in (:low, :high)
 end
 CSV.write(joinpath(OUT, "step9_boundaries.csv"), bnd)
 
-# ---- figure -------------------------------------------------------------------------
-COLOR = Dict("PBPK" => :black, "window" => :royalblue, "perarm_all8" => :gray60)
-fig = Figure(size = (1100, 450))
-for (k, ep) in enumerate(ENDPOINTS)
-    ax = Axis(fig[1, k]; title = "$ep GMR, fitted to T50 3 h + 5 h only", xlabel = "T50 (h)",
+# ---- figure: GMR along T50, one row per tested formulation ---------------------------
+fig = Figure(size = (1100, 850))
+for (i, tested) in enumerate(TESTED), (k, ep) in enumerate(ENDPOINTS)
+    ax = Axis(fig[i, k]; title = "$ep GMR, fitted to T50 3 h + $(Int(tested)) h only", xlabel = "T50 (h)",
               ylabel = "GMR vs T50 3 h", xticks = T50S)
     hlines!(ax, [BE_LOWER, BE_UPPER]; color = :gray70, linestyle = :dash)
-    vlines!(ax, setdiff(T50S, TRAIN); color = (:gray, 0.15), linewidth = 12)   # held-out formulations
+    vlines!(ax, setdiff(T50S, [REF_T50, tested]); color = (:gray, 0.15), linewidth = 12)   # predicted
     d = gmr[gmr.endpoint .== ep, :]
-    for (m, _) in sources
-        scatterlines!(ax, d.T50, d[!, Symbol("GMR_", m)]; color = COLOR[m], label = m)
+    scatterlines!(ax, d.T50, d.GMR_PBPK; color = :black, linewidth = 3, label = "PBPK (truth)")
+    for (m, c) in zip(params.model[params.tested_T50 .== tested], [:orange, :royalblue, :seagreen, :purple])
+        lines!(ax, d.T50, d[!, Symbol("GMR_", m)]; color = c, label = m)
     end
     k == 1 && axislegend(ax; position = :rt)
 end
